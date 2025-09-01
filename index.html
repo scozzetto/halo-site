@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALO - Corporate Operations</title>
+    <meta name="description" content="HALO Corporate Operations - Streamline your business operations with intelligent automation and comprehensive management solutions.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%);
+        }
+        
+        /* Logo Container */
+        .logo-container {
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .logo-container svg {
+            width: 400px;
+            height: 200px;
+            filter: drop-shadow(0 4px 20px rgba(59, 111, 216, 0.3));
+        }
+        
+        /* Tagline */
+        .tagline {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #C9C9D1;
+            margin-bottom: 1rem;
+            text-align: center;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: #888;
+            margin-bottom: 4rem;
+            text-align: center;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+        
+        /* Content Section */
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+        
+        .content h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #C0A400 0%, #3B6FD8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .feature:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(59, 111, 216, 0.5);
+            transform: translateY(-5px);
+        }
+        
+        .feature h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #C0A400;
+        }
+        
+        .feature p {
+            color: #C9C9D1;
+            line-height: 1.8;
+        }
+        
+        /* CTA Section */
+        .cta {
+            margin-top: 4rem;
+            animation: fadeInUp 1s ease-out 0.8s both;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #C0A400 0%, #3B6FD8 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(59, 111, 216, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(59, 111, 216, 0.5);
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Floating particles effect */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(59, 111, 216, 0.5);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+        
+        @keyframes float {
+            from {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo-container svg {
+                width: 300px;
+                height: 150px;
+            }
+            
+            .tagline {
+                font-size: 1.25rem;
+            }
+            
+            .content h2 {
+                font-size: 1.5rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 8s;"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="logo-container">
+            <!-- HALO Logo with Planet/Ring Design -->
+            <svg width="400" height="200" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background circle/planet -->
+                <circle cx="400" cy="200" r="150" fill="#1a1a2e" stroke="#3B6FD8" stroke-width="2"/>
+                
+                <!-- Ring around planet -->
+                <ellipse cx="400" cy="200" rx="220" ry="80" fill="none" stroke="url(#ringGradient)" stroke-width="8" transform="rotate(-15 400 200)"/>
+                
+                <!-- HALO text -->
+                <text x="400" y="220" font-family="Arial Black, sans-serif" font-size="80" font-weight="900" text-anchor="middle" fill="white">HALO</text>
+                
+                <!-- Ring gradient -->
+                <defs>
+                    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#C0A400;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#B38AF6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#3B6FD8;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        
+        <h1 class="tagline">CORPORATE OPERATIONS</h1>
+        <p class="subtitle">powered by The Business Lab</p>
+        
+        <div class="content">
+            <h2>Elevate Your Business Operations</h2>
+            <p style="font-size: 1.125rem; line-height: 1.8; color: #C9C9D1; margin-bottom: 3rem;">
+                HALO transforms how businesses manage their operations with intelligent automation, 
+                real-time analytics, and comprehensive staff management solutions. Built for modern 
+                enterprises that demand efficiency, security, and scalability.
+            </p>
+            
+            <div class="features">
+                <div class="feature">
+                    <h3>Intelligent Automation</h3>
+                    <p>Streamline workflows with AI-powered automation that learns and adapts to your business needs.</p>
+                </div>
+                
+                <div class="feature">
+                    <h3>Real-Time Analytics</h3>
+                    <p>Make data-driven decisions with comprehensive dashboards and instant insights across all operations.</p>
+                </div>
+                
+                <div class="feature">
+                    <h3>Unified Platform</h3>
+                    <p>Manage staff, patients, inventory, and communications from a single, secure interface.</p>
+                </div>
+                
+                <div class="feature">
+                    <h3>Enterprise Security</h3>
+                    <p>Bank-level encryption and compliance with HIPAA, PCI, and industry standards.</p>
+                </div>
+                
+                <div class="feature">
+                    <h3>Custom Integration</h3>
+                    <p>Seamlessly connect with your existing tools and workflows without disruption.</p>
+                </div>
+                
+                <div class="feature">
+                    <h3>24/7 Support</h3>
+                    <p>Dedicated support team and comprehensive documentation to ensure your success.</p>
+                </div>
+            </div>
+            
+            <div class="cta">
+                <a href="mailto:info@thebusinesslab.com" class="cta-button">Get Started with HALO</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
