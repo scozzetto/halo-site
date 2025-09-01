@@ -38,9 +38,9 @@
             animation: fadeInUp 1s ease-out;
         }
         
-        .logo-container svg {
+        .logo-container img {
             width: 400px;
-            height: 200px;
+            height: auto;
             filter: drop-shadow(0 4px 20px rgba(59, 111, 216, 0.3));
         }
         
@@ -188,9 +188,9 @@
         
         /* Responsive */
         @media (max-width: 768px) {
-            .logo-container svg {
+            .logo-container img {
                 width: 300px;
-                height: 150px;
+                height: auto;
             }
             
             .tagline {
@@ -220,26 +220,8 @@
     <!-- Hero Section -->
     <div class="hero">
         <div class="logo-container">
-            <!-- HALO Logo with Planet/Ring Design -->
-            <svg width="400" height="200" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Background circle/planet -->
-                <circle cx="400" cy="200" r="150" fill="#1a1a2e" stroke="#3B6FD8" stroke-width="2"/>
-                
-                <!-- Ring around planet -->
-                <ellipse cx="400" cy="200" rx="220" ry="80" fill="none" stroke="url(#ringGradient)" stroke-width="8" transform="rotate(-15 400 200)"/>
-                
-                <!-- HALO text -->
-                <text x="400" y="220" font-family="Arial Black, sans-serif" font-size="80" font-weight="900" text-anchor="middle" fill="white">HALO</text>
-                
-                <!-- Ring gradient -->
-                <defs>
-                    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#C0A400;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#B38AF6;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#3B6FD8;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-            </svg>
+            <!-- HALO Purple Logo -->
+            <img src="pics/Halo Purple.png" alt="HALO Corporate Operations" />
         </div>
         
         <h1 class="tagline">CORPORATE OPERATIONS</h1>
