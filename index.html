@@ -75,10 +75,8 @@
             font-size: 2rem;
             font-weight: 400;
             margin-bottom: 2rem;
-            background: linear-gradient(135deg, #C0A400 0%, #3B6FD8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #ffffff;
+            letter-spacing: 0.5px;
         }
         
         /* Features Grid */
@@ -107,12 +105,14 @@
         .feature h3 {
             font-size: 1.25rem;
             margin-bottom: 1rem;
-            color: #C0A400;
+            color: #B38AF6;  /* Purple from logo */
+            font-weight: 600;
         }
         
         .feature p {
-            color: #C9C9D1;
+            color: #D1D5DB;
             line-height: 1.8;
+            font-size: 0.95rem;
         }
         
         /* CTA Section */
@@ -124,18 +124,20 @@
         .cta-button {
             display: inline-block;
             padding: 1rem 2.5rem;
-            background: linear-gradient(135deg, #C0A400 0%, #3B6FD8 100%);
+            background: #8B5CF6;  /* Solid purple from logo */
             color: white;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(59, 111, 216, 0.3);
+            border: 2px solid transparent;
         }
         
         .cta-button:hover {
+            background: transparent;
+            border: 2px solid #8B5CF6;
+            color: #B38AF6;
             transform: translateY(-2px);
-            box-shadow: 0 6px 30px rgba(59, 111, 216, 0.5);
         }
         
         /* Animations */
@@ -220,7 +222,7 @@
         
         <div class="content">
             <h2>Elevate Your Business Operations</h2>
-            <p style="font-size: 1.125rem; line-height: 1.8; color: #C9C9D1; margin-bottom: 3rem;">
+            <p style="font-size: 1.125rem; line-height: 1.8; color: #E5E5E5; margin-bottom: 3rem;">
                 HALO transforms how businesses manage their operations with intelligent automation, 
                 real-time analytics, and comprehensive staff management solutions. Built for modern 
                 enterprises that demand efficiency, security, and scalability.
