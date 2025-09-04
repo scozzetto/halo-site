@@ -432,9 +432,9 @@ Be Well Integration:
   
 AI Commands:
   ai <question>     - Ask Claude a question
-  ai analyze <file> - Analyze a file with AI
-  ai code <task>    - Generate code with AI
-  ai explain        - Explain current context
+  claude <question> - Direct Claude access
+  setkey <api-key>  - Set your Anthropic API key
+  clearkey          - Clear stored API key
   
 Database:
   db tables         - List Supabase tables
@@ -617,59 +617,90 @@ Top Pages:
             ai: {
                 description: 'AI assistant powered by Claude',
                 execute: async (args) => {
-                    if (!args.length) return 'Usage: ai <question> or ai analyze <file>';
+                    if (!args.length) return 'Usage: ai <question>';
                     
-                    const query = args.join(' ');
-                    addOutput(`<span class="loading-spinner"></span> Thinking...`, 'info');
+                    const question = args.join(' ');
                     
-                    // Simulate AI response
-                    await sleep(2000);
-                    
-                    if (args[0] === 'analyze') {
+                    // Check if API key is set
+                    let apiKey = localStorage.getItem('anthropic_api_key');
+                    if (!apiKey) {
                         return `<div class="ai-response">
-<strong>AI Analysis of ${args[1] || 'file'}:</strong>
+<strong>⚠️ API Key Required</strong>
 
-This appears to be a React component that implements a chat interface for the Dr. Bio AI assistant. 
-Key features I've identified:
+To use Claude AI, you need to set your Anthropic API key:
 
-1. <span class="syntax-function">Message Management</span>: Uses state to track conversation history
-2. <span class="syntax-function">Session Handling</span>: Generates unique session IDs for each chat
-3. <span class="syntax-function">API Integration</span>: Connects to Netlify Functions backend
-4. <span class="syntax-function">File Upload</span>: Supports PDF and image uploads for analysis
+1. Get your API key from: https://console.anthropic.com/settings/keys
+2. Set it using: <code>setkey sk-ant-api03-xxxxx...xxxxx</code>
+3. Then try your command again
 
-<strong>Potential Improvements:</strong>
-- Add error boundary for better error handling
-- Implement message persistence in localStorage
-- Add typing indicators for better UX
-- Consider implementing WebSocket for real-time updates</div>`;
+Or use the demo mode: <code>ai demo</code></div>`;
                     }
                     
-                    if (query.includes('help')) {
+                    // Show thinking message
+                    const thinkingId = 'thinking-' + Date.now();
+                    addRawOutput(`<div id="${thinkingId}" class="terminal-info">🤖 Claude is thinking<span class="loading">...</span></div>`);
+                    
+                    try {
+                        // Call proxy function
+                        const response = await fetch('/.netlify/functions/claude-proxy', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                question: question,
+                                apiKey: apiKey
+                            })
+                        });
+                        
+                        // Remove thinking message
+                        const thinkingMsg = document.getElementById(thinkingId);
+                        if (thinkingMsg) thinkingMsg.remove();
+                        
+                        const data = await response.json();
+                        
+                        if (!response.ok) {
+                            return `<div class="terminal-error">Error: ${data.error || 'Failed to get response from Claude'}</div>`;
+                        }
+                        
+                        // Format the response
                         return `<div class="ai-response">
-<strong>Claude AI Assistant:</strong>
+<strong>Claude AI:</strong>
 
-I can help you with:
-- Code analysis and debugging
-- System architecture questions  
-- Be Well site navigation
-- Database queries and optimization
-- API endpoint documentation
-- Security recommendations
-- Performance optimization tips
-
-Just ask me anything about the HALO or Be Well systems!</div>`;
+${formatAIResponse(data.response)}</div>`;
+                        
+                    } catch (error) {
+                        // Remove thinking message on error
+                        const thinkingMsg = document.getElementById(thinkingId);
+                        if (thinkingMsg) thinkingMsg.remove();
+                        
+                        return `<div class="terminal-error">Error: ${error.message}</div>`;
+                    }
+                }
+            },
+            
+            claude: {
+                description: 'Direct Claude AI access',
+                execute: (args) => commands.ai.execute(args)
+            },
+            
+            setkey: {
+                description: 'Set Anthropic API key',
+                execute: (args) => {
+                    if (!args[0]) {
+                        return 'Usage: setkey <your-api-key>';
                     }
                     
-                    return `<div class="ai-response">
-<strong>Claude AI Response:</strong>
-
-I understand you're asking about "${query}". 
-
-Based on my analysis of the Be Well system, I can provide insights on their implementation. 
-The system uses a modern stack with Netlify Functions for serverless backend, Supabase for 
-database, and integrates multiple AI services including my own API for health report analysis.
-
-Would you like me to dive deeper into any specific aspect?</div>`;
+                    localStorage.setItem('anthropic_api_key', args[0]);
+                    return 'API key saved successfully. You can now use the "ai" command.';
+                }
+            },
+            
+            clearkey: {
+                description: 'Clear API key',
+                execute: () => {
+                    localStorage.removeItem('anthropic_api_key');
+                    return 'API key cleared.';
                 }
             },
             
@@ -1089,6 +1120,20 @@ HALO Terminal Ultimate v5.0.0 - Full System Access
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+        
+        // Format AI response with markdown support
+        function formatAIResponse(text) {
+            return text
+                .replace(/```([^`]+)```/g, '<pre class="code-block">$1</pre>')
+                .replace(/`([^`]+)`/g, '<code style="background: #2a2a2a; padding: 2px 4px; border-radius: 3px;">$1</code>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                .replace(/^### (.+)$/gm, '<h3 style="color: #8b5cf6; margin: 0.5rem 0;">$1</h3>')
+                .replace(/^## (.+)$/gm, '<h2 style="color: #8b5cf6; margin: 0.5rem 0;">$1</h2>')
+                .replace(/^# (.+)$/gm, '<h1 style="color: #8b5cf6; margin: 0.5rem 0;">$1</h1>')
+                .replace(/\n\n/g, '<br><br>')
+                .replace(/\n/g, '<br>');
         }
         
         function scrollToBottom() {
