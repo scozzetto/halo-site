@@ -573,9 +573,22 @@ Date:   ${new Date(Date.now() - 86400000).toLocaleString()}
                 execute: async (args) => {
                     if (!args.length) return 'Usage: ai <question>';
                     
-                    if (!apiKey) {
-                        return `⚠️ No API key set. Use: setkey <your-api-key>
-Get your key at: https://console.anthropic.com/settings/keys`;
+                    // Check for demo mode
+                    const isDemo = args[0].toLowerCase() === 'demo' || (!apiKey && args.join(' ').toLowerCase().includes('demo'));
+                    
+                    if (!apiKey && !isDemo) {
+                        return `⚠️ No API key set. You have 3 options:
+
+1. Set your API key:
+   setkey sk-ant-api03-your-key-here
+   Get a key at: https://console.anthropic.com/settings/keys
+
+2. Try demo mode:
+   ai demo hello
+   ai demo help
+   ai demo biosync
+
+3. Use natural language (it will prompt for a key)`;
                     }
                     
                     const question = args.join(' ');
@@ -585,7 +598,11 @@ Get your key at: https://console.anthropic.com/settings/keys`;
                         const response = await fetch('/.netlify/functions/claude-proxy', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ question, apiKey })
+                            body: JSON.stringify({ 
+                                question, 
+                                apiKey: isDemo ? null : apiKey,
+                                demo: isDemo 
+                            })
                         });
                         
                         const data = await response.json();
@@ -691,13 +708,31 @@ Get your key at: https://console.anthropic.com/settings/keys`;
             addOutput('Natural language processing enabled. Just type what you want!', 'info');
             
             if (!apiKey) {
-                addOutput('\n⚠️  Set your API key for full functionality:', 'warning');
-                addOutput('  setkey sk-ant-api03-xxxxx...', 'info');
+                addOutput('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'terminal-warning');
+                addOutput('🔐 API KEY SETUP REQUIRED', 'terminal-warning');
+                addOutput('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n', 'terminal-warning');
+                
+                addOutput('To enable Claude AI, you need an Anthropic API key:\n', 'info');
+                
+                addOutput('1. Get your key:', 'terminal-success');
+                addOutput('   https://console.anthropic.com/settings/keys', 'info');
+                addOutput('   - Sign up or log in');
+                addOutput('   - Click "Create Key"');
+                addOutput('   - Copy the key (starts with sk-ant-api03-)\n');
+                
+                addOutput('2. Set it in terminal:', 'terminal-success');
+                addOutput('   setkey sk-ant-api03-your-actual-key-here\n', 'terminal-command');
+                
+                addOutput('3. Or try demo mode:', 'terminal-success');
+                addOutput('   ai demo hello', 'terminal-command');
+                addOutput('   ai demo help', 'terminal-command');
+                addOutput('   ai demo biosync\n', 'terminal-command');
             } else {
-                addOutput('✅ Claude AI connected', 'success');
+                addOutput('✅ Claude AI connected and ready!', 'success');
+                addOutput('Try: ai Hello Claude!', 'info');
             }
             
-            addOutput('\nType "help" for commands or just tell me what you want to do.\n');
+            addOutput('\nType "help" for all commands.\n');
             addInputLine();
         }
         
