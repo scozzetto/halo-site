@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALO Terminal Power - Full System Access</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            background: #000000;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .terminal-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #000000;
+        }
+        
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+            user-select: none;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #444;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .terminal-button.close { background: #ff5f57; }
+        .terminal-button.minimize { background: #ffbd2e; }
+        .terminal-button.maximize { background: #28ca42; }
+        
+        .terminal-title {
+            color: #888;
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .terminal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            font-size: 14px;
+            line-height: 1.5;
+            background: #000;
+        }
+        
+        .terminal-line {
+            margin-bottom: 0.2rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .prompt { color: #8b5cf6; font-weight: bold; }
+        .command { color: #ffffff; }
+        .output { color: #c9c9d1; }
+        .error { color: #ff5f57; }
+        .success { color: #28ca42; }
+        .warning { color: #ffbd2e; }
+        .info { color: #5e9ef3; }
+        
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            flex: 1;
+            caret-color: #8b5cf6;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #8b5cf6;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+        
+        .file-tree { color: #50fa7b; }
+        .file-name { color: #f8f8f2; }
+        .file-size { color: #6272a4; font-size: 0.9em; }
+        
+        /* Syntax highlighting */
+        .syntax-keyword { color: #ff79c6; }
+        .syntax-string { color: #f1fa8c; }
+        .syntax-number { color: #bd93f9; }
+        .syntax-function { color: #50fa7b; }
+        .syntax-comment { color: #6272a4; }
+    </style>
+</head>
+<body>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-controls">
+                <div class="terminal-button close" onclick="window.close()"></div>
+                <div class="terminal-button minimize"></div>
+                <div class="terminal-button maximize" onclick="toggleFullscreen()"></div>
+            </div>
+            <div class="terminal-title" id="terminalTitle">HALO Terminal Power - Real Access</div>
+        </div>
+        
+        <div class="terminal-body" id="terminalBody"></div>
+    </div>
+
+    <script>
+        // Terminal state
+        let commandHistory = [];
+        let historyIndex = -1;
+        let currentPath = '/Users/silviomac/Library/CloudStorage/Dropbox/WEBSITES_SECURE_BACKUP/be-well-website';
+        let isProcessing = false;
+        
+        // Auth token (in production, this would be properly managed)
+        const authToken = 'demo-token-' + Date.now();
+        
+        // Backend API
+        async function callBackend(action, params = {}) {
+            try {
+                const response = await fetch('/.netlify/functions/terminal-backend', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ action, ...params })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Backend error');
+                }
+                
+                return data;
+            } catch (error) {
+                return { error: error.message };
+            }
+        }
+        
+        // Commands with real backend integration
+        const commands = {
+            help: {
+                execute: () => {
+                    return `HALO Terminal Power - Real System Access
+
+File Commands:
+  ls [path]         - List directory contents
+  cd <path>         - Change directory  
+  pwd               - Print working directory
+  cat <file>        - View file contents
+  find <pattern>    - Find files
+  grep <pattern>    - Search in files
+  
+Edit Commands:
+  edit <file>       - Edit a file
+  save              - Save current edit
+  
+Git Commands:
+  git status        - Show git status
+  git log           - Show commit history
+  git diff          - Show changes
+  
+System:
+  clear             - Clear terminal
+  exit              - Exit terminal
+  
+Special:
+  bewell            - Go to Be Well directory
+  halo              - Go to HALO directory
+  
+AI Integration:
+  Type naturally and I'll help you!`;
+                }
+            },
+            
+            pwd: {
+                execute: () => currentPath
+            },
+            
+            ls: {
+                execute: async (args) => {
+                    const path = args[0] || currentPath;
+                    addOutput('Loading directory...', 'info');
+                    
+                    const result = await callBackend('listDirectory', { dirPath: path });
+                    
+                    if (result.error) {
+                        return `Error: ${result.error}`;
+                    }
+                    
+                    // Format the file listing
+                    const files = result.files.map(file => {
+                        const icon = file.type === 'directory' ? '📁' : '📄';
+                        const size = file.type === 'file' ? ` (${formatSize(file.size)})` : '';
+                        return `${icon} ${file.name}${size}`;
+                    }).join('\n');
+                    
+                    return files || 'Empty directory';
+                }
+            },
+            
+            cd: {
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: cd <path>';
+                    
+                    let newPath;
+                    if (args[0] === '..') {
+                        newPath = currentPath.split('/').slice(0, -1).join('/');
+                    } else if (args[0].startsWith('/')) {
+                        newPath = args[0];
+                    } else {
+                        newPath = `${currentPath}/${args[0]}`;
+                    }
+                    
+                    // Verify the path exists
+                    const result = await callBackend('listDirectory', { dirPath: newPath });
+                    
+                    if (result.error) {
+                        return `cd: ${args[0]}: No such file or directory`;
+                    }
+                    
+                    currentPath = newPath;
+                    updatePrompt();
+                    return '';
+                }
+            },
+            
+            cat: {
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: cat <file>';
+                    
+                    const filePath = args[0].startsWith('/') ? args[0] : `${currentPath}/${args[0]}`;
+                    addOutput('Reading file...', 'info');
+                    
+                    const result = await callBackend('readFile', { filePath });
+                    
+                    if (result.error) {
+                        return `cat: ${args[0]}: ${result.error}`;
+                    }
+                    
+                    // Syntax highlight if it's code
+                    if (filePath.endsWith('.js') || filePath.endsWith('.html') || filePath.endsWith('.css')) {
+                        return `<pre class="code-block">${highlightSyntax(result.content, filePath)}</pre>`;
+                    }
+                    
+                    return result.content;
+                }
+            },
+            
+            grep: {
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: grep <pattern> [path]';
+                    
+                    const pattern = args[0];
+                    const directory = args[1] || currentPath;
+                    
+                    addOutput(`Searching for "${pattern}"...`, 'info');
+                    
+                    const result = await callBackend('searchFiles', { pattern, directory });
+                    
+                    if (result.error) {
+                        return `grep: ${result.error}`;
+                    }
+                    
+                    if (result.results.length === 0) {
+                        return 'No matches found';
+                    }
+                    
+                    return result.results.join('\n');
+                }
+            },
+            
+            git: {
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: git <command>';
+                    
+                    const gitCommand = `git ${args.join(' ')}`;
+                    addOutput(`Running ${gitCommand}...`, 'info');
+                    
+                    const result = await callBackend('executeCommand', { 
+                        command: gitCommand,
+                        cwd: currentPath 
+                    });
+                    
+                    if (result.error) {
+                        return `git: ${result.error}`;
+                    }
+                    
+                    return result.stdout || result.stderr;
+                }
+            },
+            
+            bewell: {
+                execute: async () => {
+                    const bewellPath = '/Users/silviomac/Library/CloudStorage/Dropbox/WEBSITES_SECURE_BACKUP/be-well-website';
+                    currentPath = bewellPath;
+                    updatePrompt();
+                    return `Switched to Be Well directory:\n${bewellPath}`;
+                }
+            },
+            
+            halo: {
+                execute: async () => {
+                    const haloPath = '/Users/silviomac/Library/CloudStorage/Dropbox/WEBSITES_SECURE_BACKUP/halo-corporate-site';
+                    currentPath = haloPath;
+                    updatePrompt();
+                    return `Switched to HALO directory:\n${haloPath}`;
+                }
+            },
+            
+            clear: {
+                execute: () => {
+                    document.getElementById('terminalBody').innerHTML = '';
+                    return null;
+                }
+            }
+        };
+        
+        // Utility functions
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + 'B';
+            if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + 'KB';
+            return Math.round(bytes / (1024 * 1024)) + 'MB';
+        }
+        
+        function highlightSyntax(code, filename) {
+            // Basic syntax highlighting
+            return code
+                .replace(/\/\/(.*?)$/gm, '<span class="syntax-comment">//$1</span>')
+                .replace(/\/\*([\s\S]*?)\*\//g, '<span class="syntax-comment">/*$1*/</span>')
+                .replace(/'([^']*?)'/g, '<span class="syntax-string">\'$1\'</span>')
+                .replace(/"([^"]*?)"/g, '<span class="syntax-string">"$1"</span>')
+                .replace(/\b(function|const|let|var|if|else|return|async|await)\b/g, '<span class="syntax-keyword">$1</span>')
+                .replace(/\b(\d+)\b/g, '<span class="syntax-number">$1</span>');
+        }
+        
+        function updatePrompt() {
+            const shortPath = currentPath.split('/').slice(-2).join('/');
+            document.getElementById('terminalTitle').textContent = `HALO Terminal Power - ${shortPath}`;
+        }
+        
+        // Initialize terminal
+        function init() {
+            addOutput(`
+ _   _    _    _     ___    ____                         
+| | | |  / \\  | |   / _ \\  |  _ \\ _____      _____ _ __ 
+| |_| | / _ \\ | |  | | | | | |_) / _ \\ \\ /\\ / / _ \\ '__|
+|  _  |/ ___ \\| |__| |_| | |  __/ (_) \\ V  V /  __/ |   
+|_| |_/_/   \\_\\____/\\___/  |_|   \\___/ \\_/\\_/ \\___|_|   
+                                                          
+Terminal Power - Real File System Access`, 'success');
+            
+            addOutput('\n🚀 Connected to real file system!', 'info');
+            addOutput(`📁 Current directory: ${currentPath}`, 'info');
+            addOutput('\nType "help" for commands or just type what you want to do.\n');
+            
+            // Test backend connection
+            testConnection();
+            
+            addInputLine();
+        }
+        
+        async function testConnection() {
+            const result = await callBackend('listDirectory', { dirPath: currentPath });
+            if (result.error) {
+                addOutput('⚠️  Backend not connected. Some features may be limited.', 'warning');
+            } else {
+                addOutput('✅ Backend connected successfully!', 'success');
+            }
+        }
+        
+        // Process natural language or commands
+        async function processInput(input) {
+            if (isProcessing) return;
+            isProcessing = true;
+            
+            const inputElement = document.getElementById('terminalInput');
+            const inputLine = inputElement.parentElement;
+            inputLine.removeChild(inputElement);
+            inputLine.removeChild(document.getElementById('cursor'));
+            
+            addCommandLine(input);
+            
+            if (input.trim()) {
+                commandHistory.push(input);
+                historyIndex = -1;
+                
+                // Check if it's a command
+                const [cmd, ...args] = input.trim().split(' ');
+                
+                if (commands[cmd]) {
+                    try {
+                        const result = await commands[cmd].execute(args);
+                        if (result !== null && result !== '') {
+                            if (result.includes('<') && result.includes('>')) {
+                                addRawOutput(result);
+                            } else {
+                                addOutput(result);
+                            }
+                        }
+                    } catch (error) {
+                        addOutput(`Error: ${error.message}`, 'error');
+                    }
+                } else {
+                    // Process as natural language
+                    await processNaturalLanguage(input);
+                }
+            }
+            
+            isProcessing = false;
+            addInputLine();
+        }
+        
+        async function processNaturalLanguage(input) {
+            const lowerInput = input.toLowerCase();
+            
+            // Map natural language to commands
+            if (lowerInput.includes('show') && lowerInput.includes('files')) {
+                await commands.ls.execute([]);
+            } else if (lowerInput.includes('what') && lowerInput.includes('directory')) {
+                addOutput(currentPath);
+            } else if (lowerInput.includes('read') || lowerInput.includes('show') && lowerInput.includes('content')) {
+                const match = input.match(/['"](.*?)['"]/);
+                if (match) {
+                    await commands.cat.execute([match[1]]);
+                } else {
+                    addOutput('Please specify a file name in quotes', 'info');
+                }
+            } else if (lowerInput.includes('find')) {
+                const match = input.match(/find\s+(.+)/i);
+                if (match) {
+                    await commands.grep.execute([match[1]]);
+                }
+            } else {
+                addOutput('I can help you with file operations. Try:', 'info');
+                addOutput('- "Show me all files"', 'info');
+                addOutput('- "Read package.json"', 'info');
+                addOutput('- "Find TODO in files"', 'info');
+            }
+        }
+        
+        // Terminal UI functions
+        function addOutput(text, className = 'output') {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = 'terminal-line ' + className;
+            line.textContent = text;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        function addRawOutput(html) {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = html;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        function addCommandLine(command) {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            const shortPath = currentPath.split('/').slice(-1)[0];
+            line.innerHTML = `<span class="prompt">${shortPath}$</span> <span class="command">${escapeHtml(command)}</span>`;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        function addInputLine() {
+            if (isProcessing) return;
+            
+            const terminalBody = document.getElementById('terminalBody');
+            const inputLine = document.createElement('div');
+            inputLine.className = 'terminal-input-line';
+            const shortPath = currentPath.split('/').slice(-1)[0];
+            inputLine.innerHTML = `
+                <span class="prompt">${shortPath}$</span>
+                <input type="text" class="terminal-input" id="terminalInput" autocomplete="off" spellcheck="false">
+                <span class="cursor" id="cursor"></span>
+            `;
+            terminalBody.appendChild(inputLine);
+            
+            const input = document.getElementById('terminalInput');
+            input.focus();
+            input.addEventListener('keydown', handleKeyDown);
+            scrollToBottom();
+        }
+        
+        function handleKeyDown(e) {
+            const input = e.target;
+            
+            switch(e.key) {
+                case 'Enter':
+                    e.preventDefault();
+                    processInput(input.value);
+                    break;
+                    
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (historyIndex < commandHistory.length - 1) {
+                        historyIndex++;
+                        input.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                    }
+                    break;
+                    
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (historyIndex > 0) {
+                        historyIndex--;
+                        input.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                    } else if (historyIndex === 0) {
+                        historyIndex = -1;
+                        input.value = '';
+                    }
+                    break;
+                    
+                case 'Tab':
+                    e.preventDefault();
+                    autocomplete(input);
+                    break;
+            }
+        }
+        
+        function autocomplete(input) {
+            const value = input.value.toLowerCase();
+            const allCommands = Object.keys(commands);
+            const matches = allCommands.filter(cmd => cmd.startsWith(value));
+            
+            if (matches.length === 1) {
+                input.value = matches[0];
+            } else if (matches.length > 1) {
+                addOutput(`\nPossible commands: ${matches.join(', ')}`);
+                addInputLine();
+                document.getElementById('terminalInput').value = value;
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function scrollToBottom() {
+            const terminalBody = document.getElementById('terminalBody');
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
