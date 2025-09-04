@@ -71,7 +71,7 @@ exports.handler = async (event, context) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': apiKey,
+                'x-api-key': finalApiKey,
                 'anthropic-version': '2023-06-01'
             },
             body: JSON.stringify({
