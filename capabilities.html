@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALO Platform Capabilities - Complete Business Management System</title>
+    <meta name="description" content="Discover everything HALO can do for your wellness business. Complete platform capabilities for patient management, scheduling, payments, and more.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 60px;
+        }
+        
+        .nav-link {
+            color: #C9C9D1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 6rem 2rem 4rem;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, transparent 100%);
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #C9C9D1;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        
+        /* Main Content */
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Category Sections */
+        .category {
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .category-icon {
+            font-size: 2.5rem;
+        }
+        
+        .category-title {
+            font-size: 2rem;
+            font-weight: 400;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-card:hover {
+            background: rgba(30, 30, 30, 0.8);
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            color: #C9C9D1;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: #8b5cf6;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        .coming-soon {
+            opacity: 0.6;
+            font-style: italic;
+        }
+        
+        .coming-soon:after {
+            content: " (Coming Soon)";
+            color: #f59e0b;
+            font-size: 0.9em;
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            margin: 4rem 0;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #8b5cf6;
+        }
+        
+        .stat-label {
+            color: #C9C9D1;
+            margin-top: 0.5rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(180deg, transparent 0%, rgba(139, 92, 246, 0.1) 100%);
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-subtitle {
+            font-size: 1.2rem;
+            color: #C9C9D1;
+            margin-bottom: 2rem;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 3rem;
+            background: #8b5cf6;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-container {
+                padding: 1rem;
+            }
+            
+            .logo {
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <img src="Pics/Halo Purple.png" alt="HALO" class="logo">
+            <a href="index.html" class="nav-link">← Back to Home</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>HALO Platform Capabilities</h1>
+        <p class="hero-subtitle">The Complete Business Management System for Wellness Centers, Medical Spas & Healthcare Facilities</p>
+    </section>
+
+    <!-- Main Content -->
+    <main class="content">
+        
+        <!-- Patient Management -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">👥</span>
+                <h2 class="category-title">Patient Experience & Management</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">Smart Check-In System</h3>
+                    <ul class="feature-list">
+                        <li>Self-service iPad kiosks</li>
+                        <li>QR code mobile check-in</li>
+                        <li>Real-time queue management</li>
+                        <li>TV waiting room displays</li>
+                        <li>SMS notifications when ready</li>
+                        <li class="coming-soon">Voice-activated check-in</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Patient Portal</h3>
+                    <ul class="feature-list">
+                        <li>24/7 online access</li>
+                        <li>Appointment booking</li>
+                        <li>Digital intake forms</li>
+                        <li>Lab result viewing</li>
+                        <li>Secure messaging</li>
+                        <li class="coming-soon">Mobile app</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Digital Forms & Documents</h3>
+                    <ul class="feature-list">
+                        <li>Pre-visit form completion</li>
+                        <li>E-signature capture</li>
+                        <li>Conditional logic forms</li>
+                        <li>Document upload portal</li>
+                        <li>Auto-population for returning patients</li>
+                        <li class="coming-soon">AI form assistant</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Communication Hub</h3>
+                    <ul class="feature-list">
+                        <li>Automated appointment reminders</li>
+                        <li>Two-way SMS messaging</li>
+                        <li>Email campaigns</li>
+                        <li>Birthday greetings</li>
+                        <li class="coming-soon">WhatsApp integration</li>
+                        <li class="coming-soon">Video consultations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scheduling & Operations -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">📅</span>
+                <h2 class="category-title">Scheduling & Operations</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">Advanced Scheduling</h3>
+                    <ul class="feature-list">
+                        <li>Multi-location booking</li>
+                        <li>Provider-specific calendars</li>
+                        <li>Service bundling</li>
+                        <li>Recurring appointments</li>
+                        <li>Waitlist management</li>
+                        <li class="coming-soon">AI-optimized scheduling</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Staff Management</h3>
+                    <ul class="feature-list">
+                        <li>5-tier role-based access</li>
+                        <li>Time & attendance tracking</li>
+                        <li>Commission calculations</li>
+                        <li>Performance metrics</li>
+                        <li>Mobile staff app</li>
+                        <li class="coming-soon">Shift marketplace</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Inventory Control</h3>
+                    <ul class="feature-list">
+                        <li>Multi-location tracking</li>
+                        <li>Low stock alerts</li>
+                        <li>Automatic reordering</li>
+                        <li>Expiration monitoring</li>
+                        <li>Supplier management</li>
+                        <li class="coming-soon">Barcode scanning</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Facility Management</h3>
+                    <ul class="feature-list">
+                        <li>Room scheduling</li>
+                        <li>Equipment tracking</li>
+                        <li>Maintenance logs</li>
+                        <li class="coming-soon">IoT device integration</li>
+                        <li class="coming-soon">Energy monitoring</li>
+                        <li class="coming-soon">Predictive maintenance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Management -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">💰</span>
+                <h2 class="category-title">Financial & Revenue Management</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">Payment Processing</h3>
+                    <ul class="feature-list">
+                        <li>Square POS integration</li>
+                        <li>Stripe online payments</li>
+                        <li>HSA/FSA acceptance</li>
+                        <li>Payment plans</li>
+                        <li>Digital gift cards</li>
+                        <li class="coming-soon">Cryptocurrency payments</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Membership Programs</h3>
+                    <ul class="feature-list">
+                        <li>4-tier subscription system</li>
+                        <li>Automated recurring billing</li>
+                        <li>Credit accumulation</li>
+                        <li>Family account linking</li>
+                        <li>Pause/resume options</li>
+                        <li class="coming-soon">NFT memberships</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Financial Reporting</h3>
+                    <ul class="feature-list">
+                        <li>Real-time revenue dashboards</li>
+                        <li>Daily cash reconciliation</li>
+                        <li>Provider commission reports</li>
+                        <li>P&L by location</li>
+                        <li>Tax reporting</li>
+                        <li class="coming-soon">QuickBooks integration</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Insurance & Billing</h3>
+                    <ul class="feature-list">
+                        <li>Insurance verification</li>
+                        <li>Claim management</li>
+                        <li>ERA posting</li>
+                        <li class="coming-soon">Real-time eligibility</li>
+                        <li class="coming-soon">Automated claim submission</li>
+                        <li class="coming-soon">Denial management AI</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clinical Features -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🏥</span>
+                <h2 class="category-title">Clinical & Health Management</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">Electronic Health Records</h3>
+                    <ul class="feature-list">
+                        <li>SOAP note creation</li>
+                        <li>Treatment planning</li>
+                        <li>Progress tracking</li>
+                        <li>Document management</li>
+                        <li class="coming-soon">Voice-to-text notes</li>
+                        <li class="coming-soon">E-prescribing</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">AI Health Assistants</h3>
+                    <ul class="feature-list">
+                        <li>Dr. Bio lab analysis</li>
+                        <li>BioSync health assessments</li>
+                        <li>Automated recommendations</li>
+                        <li>Clinical insights</li>
+                        <li class="coming-soon">Predictive health alerts</li>
+                        <li class="coming-soon">Wearable data integration</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Wellness Programs</h3>
+                    <ul class="feature-list">
+                        <li>Total Transformation 12-week program</li>
+                        <li>Progress tracking</li>
+                        <li>Educational content delivery</li>
+                        <li>Group challenges</li>
+                        <li class="coming-soon">Custom program builder</li>
+                        <li class="coming-soon">Nutrition tracking</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Lab Integration</h3>
+                    <ul class="feature-list">
+                        <li>Result imports</li>
+                        <li>Abnormal value flagging</li>
+                        <li>Trend analysis</li>
+                        <li class="coming-soon">Direct lab ordering</li>
+                        <li class="coming-soon">Lab company APIs</li>
+                        <li class="coming-soon">Biomarker tracking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marketing & Growth -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">📈</span>
+                <h2 class="category-title">Marketing & Growth</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">Marketing Automation</h3>
+                    <ul class="feature-list">
+                        <li>Email campaign builder</li>
+                        <li>Patient segmentation</li>
+                        <li>Automated workflows</li>
+                        <li>A/B testing</li>
+                        <li>ROI tracking</li>
+                        <li class="coming-soon">SMS campaigns</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Online Presence</h3>
+                    <ul class="feature-list">
+                        <li>SEO optimization</li>
+                        <li>Google Analytics integration</li>
+                        <li>Review management</li>
+                        <li>Social media scheduler</li>
+                        <li class="coming-soon">Reputation monitoring</li>
+                        <li class="coming-soon">AI content generation</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Referral Programs</h3>
+                    <ul class="feature-list">
+                        <li>Patient referral tracking</li>
+                        <li>Automated rewards</li>
+                        <li>Practitioner referrals</li>
+                        <li>Corporate wellness programs</li>
+                        <li class="coming-soon">Influencer management</li>
+                        <li class="coming-soon">Affiliate tracking</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Analytics & Intelligence</h3>
+                    <ul class="feature-list">
+                        <li>Patient retention metrics</li>
+                        <li>Service utilization</li>
+                        <li>Revenue forecasting</li>
+                        <li>Market analysis</li>
+                        <li class="coming-soon">Predictive analytics</li>
+                        <li class="coming-soon">Competitor benchmarking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology & Security -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🔒</span>
+                <h2 class="category-title">Technology & Security</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">Security & Compliance</h3>
+                    <ul class="feature-list">
+                        <li>HIPAA compliance</li>
+                        <li>PCI DSS compliance</li>
+                        <li>End-to-end encryption</li>
+                        <li>Audit trails</li>
+                        <li>Role-based access</li>
+                        <li class="coming-soon">Biometric authentication</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Cloud Infrastructure</h3>
+                    <ul class="feature-list">
+                        <li>99.9% uptime SLA</li>
+                        <li>Auto-scaling</li>
+                        <li>Daily backups</li>
+                        <li>Disaster recovery</li>
+                        <li>Real-time sync</li>
+                        <li class="coming-soon">Multi-region deployment</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Integrations</h3>
+                    <ul class="feature-list">
+                        <li>Square ecosystem</li>
+                        <li>Stripe payments</li>
+                        <li>Google Workspace</li>
+                        <li>Twilio communications</li>
+                        <li class="coming-soon">Salesforce CRM</li>
+                        <li class="coming-soon">Microsoft 365</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">API & Developers</h3>
+                    <ul class="feature-list">
+                        <li>REST API</li>
+                        <li>Webhook support</li>
+                        <li>Custom integrations</li>
+                        <li class="coming-soon">GraphQL API</li>
+                        <li class="coming-soon">SDK libraries</li>
+                        <li class="coming-soon">App marketplace</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">Proven Results with HALO</h2>
+        <div class="stats-grid">
+            <div class="stat">
+                <div class="stat-number">40%</div>
+                <div class="stat-label">Increase in Patient Retention</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">60%</div>
+                <div class="stat-label">Faster Check-in Process</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">35%</div>
+                <div class="stat-label">Growth in Revenue</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">50%</div>
+                <div class="stat-label">Less Admin Time</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2 class="cta-title">Ready to Transform Your Business?</h2>
+        <p class="cta-subtitle">Join the growing network of wellness centers powered by HALO</p>
+        <a href="mailto:info@halocorp.com" class="cta-button">Schedule a Demo</a>
+    </section>
+
+</body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALO Terminal - System Console</title>
+    <meta name="description" content="HALO Terminal - Direct system access for advanced operations">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            background: #000000;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Terminal Container */
+        .terminal-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #000000;
+        }
+        
+        /* Terminal Header */
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+            user-select: none;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #444;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .terminal-button.close {
+            background: #ff5f57;
+        }
+        
+        .terminal-button.minimize {
+            background: #ffbd2e;
+        }
+        
+        .terminal-button.maximize {
+            background: #28ca42;
+        }
+        
+        .terminal-title {
+            color: #888;
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .terminal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .terminal-action {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.2s;
+        }
+        
+        .terminal-action:hover {
+            color: #fff;
+        }
+        
+        /* Terminal Body */
+        .terminal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            font-size: 14px;
+            line-height: 1.5;
+            background: #000;
+        }
+        
+        /* Terminal Output */
+        .terminal-line {
+            margin-bottom: 0.2rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .terminal-prompt {
+            color: #8b5cf6;
+            font-weight: bold;
+        }
+        
+        .terminal-command {
+            color: #ffffff;
+        }
+        
+        .terminal-output {
+            color: #c9c9d1;
+        }
+        
+        .terminal-error {
+            color: #ff5f57;
+        }
+        
+        .terminal-success {
+            color: #28ca42;
+        }
+        
+        .terminal-warning {
+            color: #ffbd2e;
+        }
+        
+        .terminal-info {
+            color: #5e9ef3;
+        }
+        
+        /* Input Line */
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .terminal-input-prompt {
+            color: #8b5cf6;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            user-select: none;
+        }
+        
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            flex: 1;
+            caret-color: #8b5cf6;
+        }
+        
+        /* Cursor */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #8b5cf6;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Welcome ASCII Art */
+        .ascii-art {
+            color: #8b5cf6;
+            font-size: 12px;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        /* Scrollbar */
+        .terminal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
+        
+        /* Command Suggestions */
+        .suggestions {
+            position: absolute;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            z-index: 10;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .suggestion {
+            padding: 0.3rem 0.5rem;
+            cursor: pointer;
+            color: #c9c9d1;
+            transition: background 0.2s;
+        }
+        
+        .suggestion:hover,
+        .suggestion.selected {
+            background: #2a2a2a;
+            color: #ffffff;
+        }
+        
+        .suggestion-command {
+            color: #8b5cf6;
+            font-weight: bold;
+        }
+        
+        .suggestion-description {
+            color: #888;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .terminal-body {
+                font-size: 12px;
+                padding: 0.5rem;
+            }
+            
+            .terminal-input {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-controls">
+                <div class="terminal-button close" onclick="window.close()"></div>
+                <div class="terminal-button minimize"></div>
+                <div class="terminal-button maximize" onclick="toggleFullscreen()"></div>
+            </div>
+            <div class="terminal-title">HALO Terminal - halo@system:~</div>
+            <div class="terminal-actions">
+                <a href="index.html" class="terminal-action">Exit</a>
+            </div>
+        </div>
+        
+        <div class="terminal-body" id="terminalBody">
+            <!-- Terminal content will be added here -->
+        </div>
+    </div>
+
+    <script>
+        // Terminal State
+        let commandHistory = [];
+        let historyIndex = -1;
+        let currentDirectory = '/halo';
+        let isProcessing = false;
+        
+        // Available Commands
+        const commands = {
+            help: {
+                description: 'Show available commands',
+                execute: () => {
+                    return `
+Available Commands:
+  help          - Show this help message
+  clear         - Clear the terminal
+  status        - Show system status
+  stats         - Display business statistics
+  members       - List active members
+  locations     - Show all locations
+  services      - List available services
+  inventory     - Check inventory levels
+  revenue       - Show revenue metrics
+  backup        - Run system backup
+  deploy        - Deploy updates
+  api           - API endpoint information
+  docs          - Open documentation
+  about         - About HALO system
+  exit          - Exit terminal`;
+                }
+            },
+            
+            clear: {
+                description: 'Clear the terminal',
+                execute: () => {
+                    document.getElementById('terminalBody').innerHTML = '';
+                    return null;
+                }
+            },
+            
+            status: {
+                description: 'Show system status',
+                execute: async () => {
+                    addOutput('Checking system status...', 'info');
+                    await sleep(1000);
+                    return `
+HALO System Status:
+  Version:      4.0.0
+  Uptime:       99.97%
+  Database:     Connected
+  API:          Operational
+  Storage:      2.3TB / 10TB
+  Users:        1,247 active
+  Locations:    3 connected`;
+                }
+            },
+            
+            stats: {
+                description: 'Display business statistics',
+                execute: async () => {
+                    addOutput('Loading business statistics...', 'info');
+                    await sleep(1500);
+                    return `
+Business Statistics (Last 30 days):
+  Total Revenue:       $347,892
+  Active Members:      892
+  New Patients:        156
+  Services Rendered:   3,421
+  Avg Wait Time:       8.2 min
+  Satisfaction Rate:   96.3%
+  
+Top Services:
+  1. IV Therapy        (642)
+  2. Chiropractic      (534)
+  3. Massage Therapy   (412)`;
+                }
+            },
+            
+            members: {
+                description: 'List active members',
+                execute: async () => {
+                    addOutput('Fetching member data...', 'info');
+                    await sleep(800);
+                    return `
+Active Members by Tier:
+  Total Wellness (Tier 4):  124 members
+  Renew (Tier 3):          287 members
+  Revive (Tier 2):         341 members
+  Restore (Tier 1):        140 members
+  
+Total Active: 892 members
+Monthly Recurring Revenue: $241,876`;
+                }
+            },
+            
+            locations: {
+                description: 'Show all locations',
+                execute: () => {
+                    return `
+Active Locations:
+  1. Paducah, KY
+     Status: Online
+     Staff: 18 active
+     Queue: 3 waiting
+  
+  2. Nashville, TN
+     Status: Online
+     Staff: 22 active
+     Queue: 5 waiting
+  
+  3. Louisville, KY
+     Status: Online
+     Staff: 15 active
+     Queue: 2 waiting`;
+                }
+            },
+            
+            services: {
+                description: 'List available services',
+                execute: () => {
+                    return `
+Available Services:
+  - Chiropractic
+  - Massage Therapy (60/90 min)
+  - Cupping Therapy
+  - Dry Needling
+  - Colon Hydrotherapy
+  - IV Nutrition Therapy
+  - NAD+ IV Infusion
+  - Vitamin Injections
+  - Peptide Therapy
+  - Blood Testing
+  - Wellness Consultations`;
+                }
+            },
+            
+            inventory: {
+                description: 'Check inventory levels',
+                execute: async () => {
+                    addOutput('Scanning inventory...', 'info');
+                    await sleep(1200);
+                    return `
+Critical Inventory Alerts:
+  ! IV Saline Bags      12 units  (ORDER NOW)
+  ! B12 Vials           8 units   (LOW STOCK)
+  
+Current Stock Levels:
+  NAD+ Vials:          45 units
+  Glutathione:         62 units
+  Vitamin C:           89 units
+  Myers Cocktail:      34 units
+  Massage Oil:         156 units
+  
+Auto-reorder enabled for 23 items.`;
+                }
+            },
+            
+            revenue: {
+                description: 'Show revenue metrics',
+                execute: async () => {
+                    addOutput('Calculating revenue metrics...', 'info');
+                    await sleep(1000);
+                    return `
+Revenue Metrics (Current Month):
+  Membership Revenue:    $241,876
+  Service Revenue:       $89,432
+  Retail Revenue:        $16,584
+  Total Revenue:         $347,892
+  
+  YoY Growth:           +23.4%
+  MoM Growth:           +5.2%
+  
+  Top Revenue Service:   IV Therapy ($42,891)
+  Top Location:          Nashville ($156,234)`;
+                }
+            },
+            
+            backup: {
+                description: 'Run system backup',
+                execute: async () => {
+                    addOutput('Initiating backup process...', 'warning');
+                    await sleep(1000);
+                    addOutput('Creating database snapshot...', 'info');
+                    await sleep(1500);
+                    addOutput('Backing up configuration files...', 'info');
+                    await sleep(1000);
+                    addOutput('Compressing backup data...', 'info');
+                    await sleep(1200);
+                    return 'Backup completed successfully. Size: 4.7GB\nBackup ID: BK-2024-01-15-1432';
+                }
+            },
+            
+            deploy: {
+                description: 'Deploy updates',
+                execute: async () => {
+                    addOutput('Checking for updates...', 'info');
+                    await sleep(1000);
+                    return 'No updates available. System is running latest version (4.0.0)';
+                }
+            },
+            
+            api: {
+                description: 'API endpoint information',
+                execute: () => {
+                    return `
+API Endpoints:
+  Base URL: https://api.halo-system.com/v1
+  
+  Authentication:
+    POST   /auth/login
+    POST   /auth/logout
+    GET    /auth/verify
+  
+  Patients:
+    GET    /patients
+    POST   /patients
+    GET    /patients/:id
+    PUT    /patients/:id
+  
+  Documentation: https://docs.halo-system.com/api`;
+                }
+            },
+            
+            docs: {
+                description: 'Open documentation',
+                execute: () => {
+                    window.open('https://docs.halo-system.com', '_blank');
+                    return 'Opening documentation in new tab...';
+                }
+            },
+            
+            about: {
+                description: 'About HALO system',
+                execute: () => {
+                    return `
+HALO Business Management System
+Version 4.0.0
+
+Enterprise-grade platform for wellness centers,
+medical spas, and healthcare facilities.
+
+Features:
+- Complete patient management
+- Multi-location support
+- Real-time analytics
+- Inventory tracking
+- Financial reporting
+- Staff management
+- And much more...
+
+© 2024 HALO Corporation. All rights reserved.`;
+                }
+            },
+            
+            exit: {
+                description: 'Exit terminal',
+                execute: () => {
+                    window.location.href = 'index.html';
+                    return 'Exiting terminal...';
+                }
+            }
+        };
+        
+        // Initialize Terminal
+        function initTerminal() {
+            const asciiArt = `
+<span class="ascii-art">
+ _   _   ___   _     ___  
+| | | | / _ \\ | |   / _ \\ 
+| |_| |/ /_\\ \\| |  | | | |
+|  _  ||  _  || |  | | | |
+| | | || | | || |__| |_| |
+\\_| |_/\\_| |_/\\____/\\___/ 
+
+HALO Terminal v4.0.0
+</span>`;
+            
+            addRawOutput(asciiArt);
+            addOutput('Welcome to HALO Business Management System', 'success');
+            addOutput('Type "help" for available commands\n');
+            addInputLine();
+        }
+        
+        // Add output to terminal
+        function addOutput(text, type = 'output') {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = `terminal-line terminal-${type}`;
+            line.textContent = text;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        // Add raw HTML output
+        function addRawOutput(html) {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = html;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        // Add command line
+        function addCommandLine(command) {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = `<span class="terminal-prompt">halo@system:${currentDirectory}$</span> <span class="terminal-command">${escapeHtml(command)}</span>`;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        // Add input line
+        function addInputLine() {
+            if (isProcessing) return;
+            
+            const terminalBody = document.getElementById('terminalBody');
+            const inputLine = document.createElement('div');
+            inputLine.className = 'terminal-input-line';
+            inputLine.innerHTML = `
+                <span class="terminal-input-prompt">halo@system:${currentDirectory}$</span>
+                <input type="text" class="terminal-input" id="terminalInput" autocomplete="off" spellcheck="false">
+                <span class="cursor" id="cursor"></span>
+            `;
+            terminalBody.appendChild(inputLine);
+            
+            const input = document.getElementById('terminalInput');
+            input.focus();
+            
+            // Event listeners
+            input.addEventListener('keydown', handleKeyDown);
+            input.addEventListener('input', handleInput);
+            
+            scrollToBottom();
+        }
+        
+        // Handle keyboard input
+        function handleKeyDown(e) {
+            const input = e.target;
+            
+            switch(e.key) {
+                case 'Enter':
+                    e.preventDefault();
+                    processCommand(input.value);
+                    break;
+                    
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (historyIndex < commandHistory.length - 1) {
+                        historyIndex++;
+                        input.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                    }
+                    break;
+                    
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (historyIndex > 0) {
+                        historyIndex--;
+                        input.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                    } else if (historyIndex === 0) {
+                        historyIndex = -1;
+                        input.value = '';
+                    }
+                    break;
+                    
+                case 'Tab':
+                    e.preventDefault();
+                    autocomplete(input);
+                    break;
+            }
+        }
+        
+        // Handle input changes
+        function handleInput(e) {
+            // Could add real-time suggestions here
+        }
+        
+        // Process command
+        async function processCommand(commandText) {
+            if (isProcessing) return;
+            isProcessing = true;
+            
+            const input = document.getElementById('terminalInput');
+            const inputLine = input.parentElement;
+            inputLine.removeChild(input);
+            inputLine.removeChild(document.getElementById('cursor'));
+            
+            addCommandLine(commandText);
+            
+            if (commandText.trim()) {
+                commandHistory.push(commandText);
+                historyIndex = -1;
+                
+                const [cmd, ...args] = commandText.trim().toLowerCase().split(' ');
+                
+                if (commands[cmd]) {
+                    try {
+                        const result = await commands[cmd].execute(args);
+                        if (result) {
+                            addOutput(result);
+                        }
+                    } catch (error) {
+                        addOutput(`Error executing command: ${error.message}`, 'error');
+                    }
+                } else if (commandText.trim()) {
+                    addOutput(`Command not found: ${cmd}. Type "help" for available commands.`, 'error');
+                }
+            }
+            
+            isProcessing = false;
+            addInputLine();
+        }
+        
+        // Autocomplete function
+        function autocomplete(input) {
+            const value = input.value.toLowerCase();
+            const matches = Object.keys(commands).filter(cmd => cmd.startsWith(value));
+            
+            if (matches.length === 1) {
+                input.value = matches[0];
+            } else if (matches.length > 1) {
+                addOutput(`\nAvailable commands: ${matches.join(', ')}`);
+                addInputLine();
+                document.getElementById('terminalInput').value = value;
+            }
+        }
+        
+        // Utility functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function scrollToBottom() {
+            const terminalBody = document.getElementById('terminalBody');
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initTerminal);
+        
+        // Global keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+L to clear
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                commands.clear.execute();
+                addInputLine();
+            }
+        });
+    </script>
+</body>
+</html>
