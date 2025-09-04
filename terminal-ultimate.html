@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALO Terminal Ultimate - Full System Access</title>
+    <meta name="description" content="HALO Terminal Ultimate - Complete system access with AI integration">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Terminal Container */
+        .terminal-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #0a0a0a;
+        }
+        
+        /* Terminal Header */
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+            user-select: none;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #444;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .terminal-button.close {
+            background: #ff5f57;
+        }
+        
+        .terminal-button.minimize {
+            background: #ffbd2e;
+        }
+        
+        .terminal-button.maximize {
+            background: #28ca42;
+        }
+        
+        .terminal-title {
+            color: #888;
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .terminal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .terminal-action {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.2s;
+        }
+        
+        .terminal-action:hover {
+            color: #fff;
+        }
+        
+        /* Split View */
+        .terminal-split {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* Terminal Body */
+        .terminal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            font-size: 14px;
+            line-height: 1.5;
+            background: #0a0a0a;
+        }
+        
+        /* File Explorer */
+        .file-explorer {
+            width: 250px;
+            background: #111;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .file-explorer.active {
+            display: block;
+        }
+        
+        .explorer-header {
+            padding: 0.5rem 1rem;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+            color: #8b5cf6;
+        }
+        
+        .explorer-tree {
+            padding: 0.5rem;
+        }
+        
+        .tree-item {
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tree-item:hover {
+            background: #222;
+        }
+        
+        .tree-item.selected {
+            background: #2a2a2a;
+            color: #8b5cf6;
+        }
+        
+        .tree-icon {
+            width: 16px;
+            text-align: center;
+        }
+        
+        .tree-folder { color: #50fa7b; }
+        .tree-file { color: #f8f8f2; }
+        .tree-js { color: #f1fa8c; }
+        .tree-html { color: #ff79c6; }
+        .tree-css { color: #bd93f9; }
+        
+        /* Terminal Output */
+        .terminal-line {
+            margin-bottom: 0.2rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .terminal-prompt {
+            color: #8b5cf6;
+            font-weight: bold;
+        }
+        
+        .terminal-command {
+            color: #ffffff;
+        }
+        
+        .terminal-output {
+            color: #c9c9d1;
+        }
+        
+        .terminal-error {
+            color: #ff5f57;
+        }
+        
+        .terminal-success {
+            color: #28ca42;
+        }
+        
+        .terminal-warning {
+            color: #ffbd2e;
+        }
+        
+        .terminal-info {
+            color: #5e9ef3;
+        }
+        
+        /* Input Line */
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .terminal-input-prompt {
+            color: #8b5cf6;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            user-select: none;
+        }
+        
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            flex: 1;
+            caret-color: #8b5cf6;
+        }
+        
+        /* Cursor */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #8b5cf6;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* ASCII Art */
+        .ascii-art {
+            color: #8b5cf6;
+            font-size: 12px;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        /* Code Highlighting */
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+        
+        .syntax-keyword { color: #ff79c6; }
+        .syntax-string { color: #f1fa8c; }
+        .syntax-number { color: #bd93f9; }
+        .syntax-function { color: #50fa7b; }
+        .syntax-comment { color: #6272a4; }
+        .syntax-tag { color: #ff79c6; }
+        .syntax-attribute { color: #50fa7b; }
+        
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+        }
+        
+        .loading-spinner:after {
+            content: " ";
+            display: block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #8b5cf6;
+            border-color: #8b5cf6 transparent #8b5cf6 transparent;
+            animation: spinner 1.2s linear infinite;
+        }
+        
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* AI Response */
+        .ai-response {
+            border-left: 3px solid #8b5cf6;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+        }
+        
+        /* Scrollbar */
+        .terminal-body::-webkit-scrollbar,
+        .file-explorer::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-track,
+        .file-explorer::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb,
+        .file-explorer::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb:hover,
+        .file-explorer::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .terminal-body {
+                font-size: 12px;
+                padding: 0.5rem;
+            }
+            
+            .terminal-input {
+                font-size: 12px;
+            }
+            
+            .file-explorer {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-controls">
+                <div class="terminal-button close" onclick="window.close()"></div>
+                <div class="terminal-button minimize"></div>
+                <div class="terminal-button maximize" onclick="toggleFullscreen()"></div>
+            </div>
+            <div class="terminal-title" id="terminalTitle">HALO Terminal Ultimate - System Console</div>
+            <div class="terminal-actions">
+                <a href="#" class="terminal-action" onclick="toggleExplorer(); return false;">Explorer</a>
+                <a href="index.html" class="terminal-action">Exit</a>
+            </div>
+        </div>
+        
+        <div class="terminal-split">
+            <div class="file-explorer" id="fileExplorer">
+                <div class="explorer-header">Be Well System Files</div>
+                <div class="explorer-tree" id="explorerTree">
+                    <!-- File tree will be populated here -->
+                </div>
+            </div>
+            
+            <div class="terminal-body" id="terminalBody">
+                <!-- Terminal content will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Netlify Functions Base URL -->
+    <script>
+        const NETLIFY_FUNCTIONS_URL = 'https://bewelllifestylecenters.com/.netlify/functions';
+        const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE'; // This should be set in environment
+    </script>
+
+    <script>
+        // Terminal State
+        let commandHistory = [];
+        let historyIndex = -1;
+        let currentDirectory = '/';
+        let isProcessing = false;
+        let fileExplorerActive = false;
+        
+        // Be Well Site Structure (simplified for demo)
+        const beWellFiles = {
+            '/': {
+                'index.html': { type: 'file', size: '245KB' },
+                'staff/': {
+                    'secure-login.html': { type: 'file', size: '18KB' },
+                    'email-marketing.html': { type: 'file', size: '92KB' },
+                    'biosync-reports-v2.html': { type: 'file', size: '156KB' },
+                    'front-desk-selector.html': { type: 'file', size: '78KB' },
+                    'master-patient-database.html': { type: 'file', size: '134KB' }
+                },
+                'js/': {
+                    'secure-auth-client.js': { type: 'file', size: '45KB' },
+                    'dr-bio-chat.js': { type: 'file', size: '67KB' },
+                    'form-ai-assistant.js': { type: 'file', size: '34KB' }
+                },
+                'netlify/': {
+                    'functions/': {
+                        'biosync-ai-analyze.js': { type: 'file', size: '23KB' },
+                        'dr-bio-chat.js': { type: 'file', size: '19KB' },
+                        'charlie-chat.js': { type: 'file', size: '28KB' }
+                    }
+                },
+                'css/': {
+                    'main.css': { type: 'file', size: '89KB' },
+                    'dr-bio-chat.css': { type: 'file', size: '12KB' }
+                }
+            }
+        };
+        
+        // Ultimate Commands
+        const commands = {
+            help: {
+                description: 'Show available commands',
+                execute: () => {
+                    return `
+HALO Terminal Ultimate - Command Reference
+
+System Commands:
+  help              - Show this help message
+  clear             - Clear the terminal
+  pwd               - Print working directory
+  ls [path]         - List directory contents
+  cd <path>         - Change directory
+  cat <file>        - Display file contents
+  find <pattern>    - Search for files
+  grep <pattern>    - Search in files
+  
+Be Well Integration:
+  bewell status     - Check Be Well site status
+  bewell patients   - List recent patients
+  bewell reports    - View BioSync reports
+  bewell tasks      - Show staff tasks
+  bewell analytics  - Display site analytics
+  
+AI Commands:
+  ai <question>     - Ask Claude a question
+  ai analyze <file> - Analyze a file with AI
+  ai code <task>    - Generate code with AI
+  ai explain        - Explain current context
+  
+Database:
+  db tables         - List Supabase tables
+  db query <sql>    - Execute SQL query
+  db backup         - Create database backup
+  
+API Testing:
+  api test <endpoint>  - Test API endpoint
+  api docs            - Show API documentation
+  
+Development:
+  deploy            - Deploy to Netlify
+  logs              - View deployment logs
+  env               - Show environment variables
+  
+Special:
+  matrix            - Enter the Matrix
+  hack <system>     - Hack into system (demo)`;
+                }
+            },
+            
+            clear: {
+                description: 'Clear terminal',
+                execute: () => {
+                    document.getElementById('terminalBody').innerHTML = '';
+                    return null;
+                }
+            },
+            
+            pwd: {
+                description: 'Print working directory',
+                execute: () => currentDirectory
+            },
+            
+            ls: {
+                description: 'List directory contents',
+                execute: (args) => {
+                    const path = args[0] || currentDirectory;
+                    let output = [];
+                    
+                    // Simulate Be Well file structure
+                    if (path === '/' || path === '.') {
+                        output.push('<span class="tree-folder">📁 staff/</span>     - Staff portal pages');
+                        output.push('<span class="tree-folder">📁 js/</span>        - JavaScript files');
+                        output.push('<span class="tree-folder">📁 css/</span>       - Stylesheets');
+                        output.push('<span class="tree-folder">📁 netlify/</span>   - Serverless functions');
+                        output.push('<span class="tree-html">📄 index.html</span> - Main homepage');
+                    } else if (path === 'staff' || path === './staff') {
+                        output.push('<span class="tree-html">📄 secure-login.html</span>');
+                        output.push('<span class="tree-html">📄 email-marketing.html</span>');
+                        output.push('<span class="tree-html">📄 biosync-reports-v2.html</span>');
+                        output.push('<span class="tree-html">📄 front-desk-selector.html</span>');
+                    }
+                    
+                    return output.join('\n') || 'No files found';
+                }
+            },
+            
+            cd: {
+                description: 'Change directory',
+                execute: (args) => {
+                    if (!args[0] || args[0] === '~') {
+                        currentDirectory = '/';
+                        updatePrompt();
+                        return '';
+                    }
+                    
+                    // Simple directory navigation
+                    if (args[0] === '..') {
+                        const parts = currentDirectory.split('/').filter(p => p);
+                        parts.pop();
+                        currentDirectory = '/' + parts.join('/');
+                    } else if (args[0].startsWith('/')) {
+                        currentDirectory = args[0];
+                    } else {
+                        currentDirectory = currentDirectory === '/' 
+                            ? '/' + args[0]
+                            : currentDirectory + '/' + args[0];
+                    }
+                    
+                    updatePrompt();
+                    return '';
+                }
+            },
+            
+            cat: {
+                description: 'Display file contents',
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: cat <filename>';
+                    
+                    // Simulate reading Be Well files
+                    if (args[0].includes('dr-bio-chat.js')) {
+                        return `<div class="code-block"><span class="syntax-comment">// Dr. Bio AI Chat Widget</span>
+<span class="syntax-keyword">class</span> <span class="syntax-function">DrBioChat</span> {
+    <span class="syntax-function">constructor</span>() {
+        <span class="syntax-keyword">this</span>.isOpen = <span class="syntax-keyword">false</span>;
+        <span class="syntax-keyword">this</span>.messageHistory = [];
+        <span class="syntax-keyword">this</span>.sessionId = <span class="syntax-keyword">this</span>.<span class="syntax-function">generateSessionId</span>();
+        <span class="syntax-keyword">this</span>.<span class="syntax-function">init</span>();
+    }
+    
+    <span class="syntax-function">async sendMessage</span>(message) {
+        <span class="syntax-comment">// Send to Claude API</span>
+        <span class="syntax-keyword">const</span> response = <span class="syntax-keyword">await</span> <span class="syntax-function">fetch</span>(<span class="syntax-string">'/.netlify/functions/dr-bio-chat'</span>, {
+            method: <span class="syntax-string">'POST'</span>,
+            body: <span class="syntax-function">JSON.stringify</span>({ message })
+        });
+    }
+}</div>`;
+                    }
+                    
+                    return `cat: ${args[0]}: Permission denied (use 'ai analyze ${args[0]}' for AI analysis)`;
+                }
+            },
+            
+            bewell: {
+                description: 'Be Well system commands',
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: bewell <command> [options]';
+                    
+                    switch (args[0]) {
+                        case 'status':
+                            addOutput('Checking Be Well systems...', 'info');
+                            await sleep(1000);
+                            return `
+Be Well LifeStyle Centers - System Status
+==========================================
+Website:      ✅ Online (https://bewelllifestylecenters.com)
+Database:     ✅ Connected (Supabase)
+Functions:    ✅ 46/46 operational
+Locations:    ✅ 3 active (Birmingham, Berkley, UWM)
+Staff Portal: ✅ Accessible
+BioSync:      ✅ AI Reports Active
+Dr. Bio:      ✅ Chat Assistant Online`;
+                            
+                        case 'patients':
+                            addOutput('Fetching recent patients...', 'info');
+                            await sleep(800);
+                            return `
+Recent Patients (Last 24 hours):
+ID      Name                Service           Location      Status
+-----   -----------------   ---------------   -----------   -------
+10234   Amanda Blaine      BioSync           Birmingham    ✅ Complete
+10235   John Smith         Chiropractic      Berkley       ⏳ In Progress  
+10236   Sarah Johnson      IV Therapy        UWM           ⏳ Waiting
+10237   Mike Williams      Massage           Birmingham    ✅ Complete`;
+                            
+                        case 'reports':
+                            return `
+BioSync Reports Summary:
+- Total Reports: 1,847
+- This Week: 42
+- Pending Analysis: 3
+- AI Recommendations Generated: 1,624
+
+Use 'api test /biosync-reports' for detailed data`;
+                            
+                        case 'analytics':
+                            addOutput('Loading analytics...', 'info');
+                            await sleep(1200);
+                            return `
+Be Well Analytics Dashboard
+==========================
+Daily Visitors:     2,456
+Page Views:         8,923  
+Conversion Rate:    3.2%
+Avg Session:        4m 32s
+
+Top Pages:
+1. /biosync          (1,234 views)
+2. /services         (987 views)  
+3. /membership       (756 views)`;
+                            
+                        default:
+                            return `Unknown bewell command: ${args[0]}`;
+                    }
+                }
+            },
+            
+            ai: {
+                description: 'AI assistant powered by Claude',
+                execute: async (args) => {
+                    if (!args.length) return 'Usage: ai <question> or ai analyze <file>';
+                    
+                    const query = args.join(' ');
+                    addOutput(`<span class="loading-spinner"></span> Thinking...`, 'info');
+                    
+                    // Simulate AI response
+                    await sleep(2000);
+                    
+                    if (args[0] === 'analyze') {
+                        return `<div class="ai-response">
+<strong>AI Analysis of ${args[1] || 'file'}:</strong>
+
+This appears to be a React component that implements a chat interface for the Dr. Bio AI assistant. 
+Key features I've identified:
+
+1. <span class="syntax-function">Message Management</span>: Uses state to track conversation history
+2. <span class="syntax-function">Session Handling</span>: Generates unique session IDs for each chat
+3. <span class="syntax-function">API Integration</span>: Connects to Netlify Functions backend
+4. <span class="syntax-function">File Upload</span>: Supports PDF and image uploads for analysis
+
+<strong>Potential Improvements:</strong>
+- Add error boundary for better error handling
+- Implement message persistence in localStorage
+- Add typing indicators for better UX
+- Consider implementing WebSocket for real-time updates</div>`;
+                    }
+                    
+                    if (query.includes('help')) {
+                        return `<div class="ai-response">
+<strong>Claude AI Assistant:</strong>
+
+I can help you with:
+- Code analysis and debugging
+- System architecture questions  
+- Be Well site navigation
+- Database queries and optimization
+- API endpoint documentation
+- Security recommendations
+- Performance optimization tips
+
+Just ask me anything about the HALO or Be Well systems!</div>`;
+                    }
+                    
+                    return `<div class="ai-response">
+<strong>Claude AI Response:</strong>
+
+I understand you're asking about "${query}". 
+
+Based on my analysis of the Be Well system, I can provide insights on their implementation. 
+The system uses a modern stack with Netlify Functions for serverless backend, Supabase for 
+database, and integrates multiple AI services including my own API for health report analysis.
+
+Would you like me to dive deeper into any specific aspect?</div>`;
+                }
+            },
+            
+            db: {
+                description: 'Database commands',
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: db <command> [options]';
+                    
+                    switch (args[0]) {
+                        case 'tables':
+                            addOutput('Connecting to Supabase...', 'info');
+                            await sleep(1000);
+                            return `
+Supabase Tables:
+================
+📊 master_patients         - Patient records
+📊 biosync_reports        - AI health reports  
+📊 dr_bio_chats          - Chat conversations
+📊 dr_bio_uploads        - Uploaded documents
+📊 patient_checkins      - Daily check-ins
+📊 staff_users           - Staff accounts
+📊 membership_data       - Member subscriptions
+📊 activity_logs         - System audit trail
+📊 marketing_campaigns   - Email campaigns
+📊 inventory_items       - Stock tracking`;
+                            
+                        case 'query':
+                            if (!args[1]) return 'Usage: db query <SQL>';
+                            return `Executing query: ${args.slice(1).join(' ')}\n\n[Security Notice: Direct queries disabled in demo mode]`;
+                            
+                        case 'backup':
+                            addOutput('Initiating database backup...', 'warning');
+                            await sleep(2000);
+                            return 'Database backup completed: backup_2025_01_15_1623.sql (487MB)';
+                            
+                        default:
+                            return `Unknown db command: ${args[0]}`;
+                    }
+                }
+            },
+            
+            api: {
+                description: 'API testing',
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: api test <endpoint>';
+                    
+                    if (args[0] === 'test') {
+                        const endpoint = args[1] || '/health';
+                        addOutput(`Testing API endpoint: ${endpoint}`, 'info');
+                        await sleep(1500);
+                        
+                        return `<div class="code-block">
+GET ${NETLIFY_FUNCTIONS_URL}${endpoint}
+Status: <span class="syntax-number">200 OK</span>
+Response:
+{
+    "<span class="syntax-attribute">status</span>": "<span class="syntax-string">operational</span>",
+    "<span class="syntax-attribute">timestamp</span>": "<span class="syntax-string">${new Date().toISOString()}</span>",
+    "<span class="syntax-attribute">version</span>": "<span class="syntax-string">3.9.14</span>"
+}</div>`;
+                    }
+                    
+                    if (args[0] === 'docs') {
+                        return `
+API Documentation:
+==================
+Base URL: ${NETLIFY_FUNCTIONS_URL}
+
+Endpoints:
+- /dr-bio-chat         - AI chat conversations
+- /biosync-analyze     - Health report analysis  
+- /patient-checkin     - Patient check-in system
+- /email-send          - Email notifications
+- /stripe-webhook      - Payment processing`;
+                    }
+                    
+                    return 'Usage: api test <endpoint> or api docs';
+                }
+            },
+            
+            matrix: {
+                description: 'Enter the Matrix',
+                execute: async () => {
+                    const matrix = '01011001 01101111 01110101 00100000 01100001 01110010 01100101 00100000 01110100 01101000 01100101 00100000 01001111 01101110 01100101';
+                    addOutput(matrix, 'success');
+                    await sleep(1000);
+                    
+                    for (let i = 0; i < 10; i++) {
+                        const line = Array(80).fill(0).map(() => Math.random() > 0.5 ? '1' : '0').join('');
+                        addOutput(line, 'success');
+                        await sleep(100);
+                    }
+                    
+                    return '\nWelcome to the Matrix, Neo.';
+                }
+            },
+            
+            hack: {
+                description: 'Hack into system',
+                execute: async (args) => {
+                    const target = args[0] || 'mainframe';
+                    addOutput(`Initiating hack on ${target}...`, 'warning');
+                    await sleep(1000);
+                    addOutput('Bypassing firewall...', 'info');
+                    await sleep(1000);
+                    addOutput('Injecting payload...', 'info');
+                    await sleep(1000);
+                    addOutput('Gaining root access...', 'success');
+                    await sleep(500);
+                    return `\n✅ Successfully hacked ${target}!\n\n[This is a simulation - no actual hacking performed]`;
+                }
+            },
+            
+            deploy: {
+                description: 'Deploy to Netlify',
+                execute: async () => {
+                    addOutput('Building application...', 'info');
+                    await sleep(2000);
+                    addOutput('Optimizing assets...', 'info');
+                    await sleep(1500);
+                    addOutput('Deploying to Netlify...', 'info');
+                    await sleep(2000);
+                    return `
+Deployment Successful!
+===================
+Build ID: 65a7f3d9
+URL: https://bewelllifestylecenters.com
+Time: 47.3s
+Status: ✅ Live`;
+                }
+            },
+            
+            find: {
+                description: 'Search for files',
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: find <pattern>';
+                    
+                    addOutput(`Searching for "${args[0]}"...`, 'info');
+                    await sleep(800);
+                    
+                    return `
+Found 5 matches:
+./js/dr-bio-chat.js
+./netlify/functions/dr-bio-chat.js  
+./css/dr-bio-chat.css
+./staff/biosync-reports-v2.html
+./documentation/dr-bio-guide.md`;
+                }
+            },
+            
+            grep: {
+                description: 'Search in files',
+                execute: async (args) => {
+                    if (!args[0]) return 'Usage: grep <pattern> [file]';
+                    
+                    addOutput(`Searching for "${args[0]}"...`, 'info');
+                    await sleep(600);
+                    
+                    return `<div class="code-block">
+./js/dr-bio-chat.js:142:    <span class="syntax-string">"${args[0]}"</span>: true,
+./js/dr-bio-chat.js:256:    if (message.includes(<span class="syntax-string">"${args[0]}"</span>)) {
+./netlify/functions/dr-bio-chat.js:89:    // Process <span class="syntax-string">"${args[0]}"</span> requests</div>`;
+                }
+            },
+            
+            env: {
+                description: 'Show environment variables',
+                execute: () => {
+                    return `
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxx...xxxxx
+SUPABASE_URL=https://njxiztrrfzhftzcnweuh.supabase.co
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+NETLIFY_SITE_ID=8f7c3d9a-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+NODE_ENV=production
+SITE_URL=https://bewelllifestylecenters.com`;
+                }
+            },
+            
+            logs: {
+                description: 'View deployment logs',
+                execute: async () => {
+                    const logs = [
+                        '10:23:45 AM: Build ready to start',
+                        '10:23:47 AM: build-image version: 4.16.0',
+                        '10:23:48 AM: Installing dependencies',
+                        '10:23:52 AM: Started saving node modules',
+                        '10:23:55 AM: Finished saving node modules',
+                        '10:23:56 AM: Starting post processing',
+                        '10:23:58 AM: Post processing - success',
+                        '10:24:02 AM: Site is live ✨'
+                    ];
+                    
+                    for (const log of logs) {
+                        addOutput(log);
+                        await sleep(300);
+                    }
+                    
+                    return '';
+                }
+            }
+        };
+        
+        // Helper Functions
+        function updatePrompt() {
+            document.getElementById('terminalTitle').textContent = `HALO Terminal Ultimate - ${currentDirectory}`;
+        }
+        
+        function toggleExplorer() {
+            const explorer = document.getElementById('fileExplorer');
+            fileExplorerActive = !fileExplorerActive;
+            explorer.classList.toggle('active', fileExplorerActive);
+            
+            if (fileExplorerActive) {
+                populateExplorer();
+            }
+        }
+        
+        function populateExplorer() {
+            const tree = document.getElementById('explorerTree');
+            tree.innerHTML = `
+                <div class="tree-item" onclick="selectFile('index.html')">
+                    <span class="tree-icon tree-html">📄</span> index.html
+                </div>
+                <div class="tree-item">
+                    <span class="tree-icon tree-folder">📁</span> staff/
+                </div>
+                <div class="tree-item" style="padding-left: 1.5rem;" onclick="selectFile('staff/biosync-reports-v2.html')">
+                    <span class="tree-icon tree-html">📄</span> biosync-reports-v2.html
+                </div>
+                <div class="tree-item" style="padding-left: 1.5rem;" onclick="selectFile('staff/email-marketing.html')">
+                    <span class="tree-icon tree-html">📄</span> email-marketing.html
+                </div>
+                <div class="tree-item">
+                    <span class="tree-icon tree-folder">📁</span> js/
+                </div>
+                <div class="tree-item" style="padding-left: 1.5rem;" onclick="selectFile('js/dr-bio-chat.js')">
+                    <span class="tree-icon tree-js">📄</span> dr-bio-chat.js
+                </div>
+                <div class="tree-item">
+                    <span class="tree-icon tree-folder">📁</span> netlify/functions/
+                </div>
+                <div class="tree-item" style="padding-left: 1.5rem;" onclick="selectFile('netlify/functions/dr-bio-chat.js')">
+                    <span class="tree-icon tree-js">📄</span> dr-bio-chat.js
+                </div>
+            `;
+        }
+        
+        function selectFile(file) {
+            addOutput(`Selected: ${file}`, 'info');
+            addOutput('Use "cat ' + file + '" to view contents or "ai analyze ' + file + '" for AI analysis');
+            addInputLine();
+        }
+        
+        // Terminal Functions
+        function initTerminal() {
+            const asciiArt = `
+<span class="ascii-art">
+ _   _   ___   _     ___    _   _ _ _   _                 _       
+| | | | / _ \\ | |   / _ \\  | | | | | | (_)               | |      
+| |_| |/ /_\\ \\| |  | | | | | | | | | |_ _ _ __ ___   __ _| |_ ___ 
+|  _  ||  _  || |  | | | | | | | | | __| | '_ \` _ \\ / _\` | __/ _ \\
+| | | || | | || |__| |_| | | |_| | | |_| | | | | | | (_| | ||  __/
+\\_| |_/\\_| |_/\\____/\\___/   \\___/|_|\\__|_|_| |_| |_|\\__,_|\\__\\___|
+
+HALO Terminal Ultimate v5.0.0 - Full System Access
+</span>`;
+            
+            addRawOutput(asciiArt);
+            addOutput('Welcome to HALO Terminal Ultimate', 'success');
+            addOutput('Full access to Be Well systems and Claude AI integration', 'info');
+            addOutput('Type "help" for available commands\n');
+            addInputLine();
+        }
+        
+        function addOutput(text, type = 'output') {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = `terminal-line terminal-${type}`;
+            line.textContent = text;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        function addRawOutput(html) {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = html;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        function addCommandLine(command) {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = `<span class="terminal-prompt">root@halo:${currentDirectory}#</span> <span class="terminal-command">${escapeHtml(command)}</span>`;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        function addInputLine() {
+            if (isProcessing) return;
+            
+            const terminalBody = document.getElementById('terminalBody');
+            const inputLine = document.createElement('div');
+            inputLine.className = 'terminal-input-line';
+            inputLine.innerHTML = `
+                <span class="terminal-input-prompt">root@halo:${currentDirectory}#</span>
+                <input type="text" class="terminal-input" id="terminalInput" autocomplete="off" spellcheck="false">
+                <span class="cursor" id="cursor"></span>
+            `;
+            terminalBody.appendChild(inputLine);
+            
+            const input = document.getElementById('terminalInput');
+            input.focus();
+            
+            input.addEventListener('keydown', handleKeyDown);
+            scrollToBottom();
+        }
+        
+        function handleKeyDown(e) {
+            const input = e.target;
+            
+            switch(e.key) {
+                case 'Enter':
+                    e.preventDefault();
+                    processCommand(input.value);
+                    break;
+                    
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (historyIndex < commandHistory.length - 1) {
+                        historyIndex++;
+                        input.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                    }
+                    break;
+                    
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (historyIndex > 0) {
+                        historyIndex--;
+                        input.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                    } else if (historyIndex === 0) {
+                        historyIndex = -1;
+                        input.value = '';
+                    }
+                    break;
+                    
+                case 'Tab':
+                    e.preventDefault();
+                    autocomplete(input);
+                    break;
+                    
+                case 'l':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        commands.clear.execute();
+                        addInputLine();
+                    }
+                    break;
+            }
+        }
+        
+        async function processCommand(commandText) {
+            if (isProcessing) return;
+            isProcessing = true;
+            
+            const input = document.getElementById('terminalInput');
+            const inputLine = input.parentElement;
+            inputLine.removeChild(input);
+            inputLine.removeChild(document.getElementById('cursor'));
+            
+            addCommandLine(commandText);
+            
+            if (commandText.trim()) {
+                commandHistory.push(commandText);
+                historyIndex = -1;
+                
+                const [cmd, ...args] = commandText.trim().split(' ');
+                
+                if (commands[cmd]) {
+                    try {
+                        const result = await commands[cmd].execute(args);
+                        if (result !== null && result !== undefined) {
+                            if (result) {
+                                addRawOutput(result);
+                            }
+                        }
+                    } catch (error) {
+                        addOutput(`Error: ${error.message}`, 'error');
+                    }
+                } else if (commandText.trim()) {
+                    addOutput(`Command not found: ${cmd}. Type "help" for available commands.`, 'error');
+                }
+            }
+            
+            isProcessing = false;
+            addInputLine();
+        }
+        
+        function autocomplete(input) {
+            const value = input.value.toLowerCase();
+            const allCommands = Object.keys(commands);
+            const matches = allCommands.filter(cmd => cmd.startsWith(value));
+            
+            if (matches.length === 1) {
+                input.value = matches[0];
+            } else if (matches.length > 1) {
+                addOutput(`\nPossible commands: ${matches.join(', ')}`);
+                addInputLine();
+                document.getElementById('terminalInput').value = value;
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function scrollToBottom() {
+            const terminalBody = document.getElementById('terminalBody');
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('DOMContentLoaded', initTerminal);
+    </script>
+</body>
+</html>
