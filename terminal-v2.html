@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALO Terminal Pro - Advanced System Console</title>
+    <meta name="description" content="HALO Terminal Pro - Advanced system console with real capabilities">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            background: #000000;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Terminal Container */
+        .terminal-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #000000;
+        }
+        
+        /* Terminal Header */
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+            user-select: none;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #444;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .terminal-button.close {
+            background: #ff5f57;
+        }
+        
+        .terminal-button.minimize {
+            background: #ffbd2e;
+        }
+        
+        .terminal-button.maximize {
+            background: #28ca42;
+        }
+        
+        .terminal-title {
+            color: #888;
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .terminal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .terminal-action {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.2s;
+        }
+        
+        .terminal-action:hover {
+            color: #fff;
+        }
+        
+        /* Terminal Body */
+        .terminal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            font-size: 14px;
+            line-height: 1.5;
+            background: #000;
+        }
+        
+        /* Terminal Output */
+        .terminal-line {
+            margin-bottom: 0.2rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .terminal-prompt {
+            color: #8b5cf6;
+            font-weight: bold;
+        }
+        
+        .terminal-command {
+            color: #ffffff;
+        }
+        
+        .terminal-output {
+            color: #c9c9d1;
+        }
+        
+        .terminal-error {
+            color: #ff5f57;
+        }
+        
+        .terminal-success {
+            color: #28ca42;
+        }
+        
+        .terminal-warning {
+            color: #ffbd2e;
+        }
+        
+        .terminal-info {
+            color: #5e9ef3;
+        }
+        
+        /* Input Line */
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .terminal-input-prompt {
+            color: #8b5cf6;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            user-select: none;
+        }
+        
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            flex: 1;
+            caret-color: #8b5cf6;
+        }
+        
+        /* Cursor */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #8b5cf6;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* ASCII Art */
+        .ascii-art {
+            color: #8b5cf6;
+            font-size: 12px;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        /* Scrollbar */
+        .terminal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+        
+        /* Code Highlighting */
+        .code-line {
+            font-family: 'SF Mono', Monaco, monospace;
+            background: #1a1a1a;
+            padding: 0.2rem 0.5rem;
+            margin: 0.2rem 0;
+            border-radius: 3px;
+        }
+        
+        .keyword { color: #ff79c6; }
+        .string { color: #f1fa8c; }
+        .number { color: #bd93f9; }
+        .function { color: #50fa7b; }
+        .comment { color: #6272a4; }
+        
+        /* Loading Animation */
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+        }
+        
+        /* File Tree */
+        .file-tree {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .file-tree .directory {
+            color: #50fa7b;
+        }
+        
+        .file-tree .file {
+            color: #f8f8f2;
+        }
+        
+        .file-tree .executable {
+            color: #ff79c6;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .terminal-body {
+                font-size: 12px;
+                padding: 0.5rem;
+            }
+            
+            .terminal-input {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-controls">
+                <div class="terminal-button close" onclick="window.close()"></div>
+                <div class="terminal-button minimize"></div>
+                <div class="terminal-button maximize" onclick="toggleFullscreen()"></div>
+            </div>
+            <div class="terminal-title" id="terminalTitle">HALO Terminal Pro - /</div>
+            <div class="terminal-actions">
+                <a href="terminal.html" class="terminal-action">Basic Mode</a>
+                <a href="index.html" class="terminal-action">Exit</a>
+            </div>
+        </div>
+        
+        <div class="terminal-body" id="terminalBody">
+            <!-- Terminal content will be added here -->
+        </div>
+    </div>
+
+    <script>
+        // Terminal State
+        let commandHistory = [];
+        let historyIndex = -1;
+        let currentDirectory = '/';
+        let isProcessing = false;
+        let fileSystem = {
+            '/': {
+                type: 'directory',
+                children: {
+                    'home': {
+                        type: 'directory',
+                        children: {
+                            'user': {
+                                type: 'directory',
+                                children: {
+                                    'documents': { type: 'directory', children: {} },
+                                    'projects': { 
+                                        type: 'directory', 
+                                        children: {
+                                            'halo': {
+                                                type: 'directory',
+                                                children: {
+                                                    'config.json': { type: 'file', content: '{\n  "name": "HALO System",\n  "version": "4.0.0",\n  "api": "https://api.halo-system.com"\n}' },
+                                                    'README.md': { type: 'file', content: '# HALO Business Management System\n\nEnterprise platform for modern businesses.' }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    '.bashrc': { type: 'file', content: '# User configuration\nexport PATH=$PATH:/usr/local/bin\nalias ll="ls -la"' }
+                                }
+                            }
+                        }
+                    },
+                    'etc': {
+                        type: 'directory',
+                        children: {
+                            'hosts': { type: 'file', content: '127.0.0.1    localhost\n::1          localhost' }
+                        }
+                    },
+                    'var': {
+                        type: 'directory',
+                        children: {
+                            'log': { 
+                                type: 'directory',
+                                children: {
+                                    'system.log': { type: 'file', content: '[2024-01-15 10:23:45] System started\n[2024-01-15 10:23:46] All services operational' }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        
+        // Advanced Commands
+        const commands = {
+            help: {
+                description: 'Show available commands',
+                execute: () => {
+                    return `
+Available Commands:
+
+File System:
+  ls [path]      - List directory contents
+  cd <path>      - Change directory
+  pwd            - Print working directory
+  cat <file>     - Display file contents
+  mkdir <dir>    - Create directory
+  touch <file>   - Create empty file
+  rm <file>      - Remove file or directory
+  cp <src> <dst> - Copy file
+  mv <src> <dst> - Move/rename file
+  
+Text Editing:
+  echo <text>    - Display text
+  echo > file    - Write to file
+  echo >> file   - Append to file
+  
+System:
+  clear          - Clear terminal
+  date           - Show current date/time
+  whoami         - Display current user
+  uname          - Show system information
+  env            - Display environment variables
+  history        - Show command history
+  
+Network:
+  ping <host>    - Test network connectivity
+  curl <url>     - Fetch web content
+  
+Process:
+  ps             - Show running processes
+  top            - Display system resources
+  
+Development:
+  node <file>    - Run JavaScript file
+  python <file>  - Run Python file
+  git <command>  - Git version control
+  
+Other:
+  help           - Show this help
+  exit           - Exit terminal`;
+                }
+            },
+            
+            ls: {
+                description: 'List directory contents',
+                execute: (args) => {
+                    const path = args[0] || currentDirectory;
+                    const dir = resolvePath(path);
+                    
+                    if (!dir || dir.type !== 'directory') {
+                        return `ls: ${path}: No such file or directory`;
+                    }
+                    
+                    const items = Object.entries(dir.children || {})
+                        .map(([name, item]) => {
+                            if (item.type === 'directory') {
+                                return `<span class="directory">${name}/</span>`;
+                            } else if (name.endsWith('.sh') || name.endsWith('.js')) {
+                                return `<span class="executable">${name}</span>`;
+                            }
+                            return `<span class="file">${name}</span>`;
+                        });
+                    
+                    return items.join('  ') || '<empty directory>';
+                }
+            },
+            
+            cd: {
+                description: 'Change directory',
+                execute: (args) => {
+                    if (!args[0]) {
+                        currentDirectory = '/home/user';
+                        updatePrompt();
+                        return '';
+                    }
+                    
+                    const newPath = args[0] === '/' ? '/' : resolvePath(args[0], true);
+                    const dir = resolvePath(args[0]);
+                    
+                    if (!dir || dir.type !== 'directory') {
+                        return `cd: ${args[0]}: No such file or directory`;
+                    }
+                    
+                    currentDirectory = newPath;
+                    updatePrompt();
+                    return '';
+                }
+            },
+            
+            pwd: {
+                description: 'Print working directory',
+                execute: () => currentDirectory
+            },
+            
+            cat: {
+                description: 'Display file contents',
+                execute: (args) => {
+                    if (!args[0]) {
+                        return 'cat: missing file operand';
+                    }
+                    
+                    const file = resolvePath(args[0]);
+                    if (!file) {
+                        return `cat: ${args[0]}: No such file or directory`;
+                    }
+                    if (file.type !== 'file') {
+                        return `cat: ${args[0]}: Is a directory`;
+                    }
+                    
+                    return file.content || '';
+                }
+            },
+            
+            echo: {
+                description: 'Display text',
+                execute: (args) => {
+                    const text = args.join(' ');
+                    
+                    // Handle redirection
+                    if (args.includes('>')) {
+                        const redirectIndex = args.indexOf('>');
+                        const content = args.slice(0, redirectIndex).join(' ');
+                        const filename = args[redirectIndex + 1];
+                        
+                        if (!filename) {
+                            return 'bash: syntax error near unexpected token `newline\'';
+                        }
+                        
+                        const parentPath = currentDirectory;
+                        const parent = resolvePath(parentPath);
+                        
+                        if (parent && parent.type === 'directory') {
+                            parent.children[filename] = {
+                                type: 'file',
+                                content: content
+                            };
+                            return '';
+                        }
+                    }
+                    
+                    return text;
+                }
+            },
+            
+            mkdir: {
+                description: 'Create directory',
+                execute: (args) => {
+                    if (!args[0]) {
+                        return 'mkdir: missing operand';
+                    }
+                    
+                    const parent = resolvePath(currentDirectory);
+                    if (parent && parent.type === 'directory') {
+                        parent.children[args[0]] = {
+                            type: 'directory',
+                            children: {}
+                        };
+                        return '';
+                    }
+                    return 'mkdir: cannot create directory';
+                }
+            },
+            
+            touch: {
+                description: 'Create empty file',
+                execute: (args) => {
+                    if (!args[0]) {
+                        return 'touch: missing file operand';
+                    }
+                    
+                    const parent = resolvePath(currentDirectory);
+                    if (parent && parent.type === 'directory') {
+                        parent.children[args[0]] = {
+                            type: 'file',
+                            content: ''
+                        };
+                        return '';
+                    }
+                    return 'touch: cannot create file';
+                }
+            },
+            
+            rm: {
+                description: 'Remove file or directory',
+                execute: (args) => {
+                    if (!args[0]) {
+                        return 'rm: missing operand';
+                    }
+                    
+                    const parts = args[0].split('/');
+                    const filename = parts.pop();
+                    const parentPath = parts.join('/') || currentDirectory;
+                    const parent = resolvePath(parentPath);
+                    
+                    if (parent && parent.children && parent.children[filename]) {
+                        delete parent.children[filename];
+                        return '';
+                    }
+                    
+                    return `rm: ${args[0]}: No such file or directory`;
+                }
+            },
+            
+            clear: {
+                description: 'Clear the terminal',
+                execute: () => {
+                    document.getElementById('terminalBody').innerHTML = '';
+                    return null;
+                }
+            },
+            
+            date: {
+                description: 'Show current date/time',
+                execute: () => new Date().toString()
+            },
+            
+            whoami: {
+                description: 'Display current user',
+                execute: () => 'admin'
+            },
+            
+            uname: {
+                description: 'Show system information',
+                execute: (args) => {
+                    if (args[0] === '-a') {
+                        return 'HALO 4.0.0 HALO-Terminal #1 SMP Web x86_64 GNU/Linux';
+                    }
+                    return 'HALO';
+                }
+            },
+            
+            env: {
+                description: 'Display environment variables',
+                execute: () => {
+                    return `USER=admin
+HOME=/home/user
+PATH=/usr/local/bin:/usr/bin:/bin
+SHELL=/bin/bash
+HALO_VERSION=4.0.0
+HALO_API=https://api.halo-system.com`;
+                }
+            },
+            
+            history: {
+                description: 'Show command history',
+                execute: () => {
+                    return commandHistory.map((cmd, i) => `  ${i + 1}  ${cmd}`).join('\n');
+                }
+            },
+            
+            ping: {
+                description: 'Test network connectivity',
+                execute: async (args) => {
+                    if (!args[0]) {
+                        return 'ping: missing host operand';
+                    }
+                    
+                    addOutput(`PING ${args[0]} ...`, 'info');
+                    for (let i = 1; i <= 4; i++) {
+                        await sleep(500);
+                        addOutput(`64 bytes from ${args[0]}: seq=${i} ttl=64 time=${Math.floor(Math.random() * 50 + 10)}ms`);
+                    }
+                    return `\n--- ${args[0]} ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss`;
+                }
+            },
+            
+            curl: {
+                description: 'Fetch web content',
+                execute: async (args) => {
+                    if (!args[0]) {
+                        return 'curl: missing URL';
+                    }
+                    
+                    addOutput(`Fetching ${args[0]}...`, 'info');
+                    await sleep(1000);
+                    
+                    if (args[0].includes('api.halo-system.com')) {
+                        return JSON.stringify({
+                            status: 'operational',
+                            version: '4.0.0',
+                            endpoints: ['/clients', '/projects', '/analytics']
+                        }, null, 2);
+                    }
+                    
+                    return `<!DOCTYPE html>\n<html>\n<head><title>Response</title></head>\n<body>HTTP/1.1 200 OK</body>\n</html>`;
+                }
+            },
+            
+            ps: {
+                description: 'Show running processes',
+                execute: () => {
+                    return `  PID TTY          TIME CMD
+    1 ?        00:00:02 systemd
+   42 ?        00:00:00 halo-server
+   43 ?        00:00:01 halo-api
+   44 ?        00:00:00 halo-worker
+   99 pts/0    00:00:00 bash
+  142 pts/0    00:00:00 ps`;
+                }
+            },
+            
+            top: {
+                description: 'Display system resources',
+                execute: async () => {
+                    addOutput('Tasks: 5 total, 1 running', 'info');
+                    addOutput('%Cpu(s): 12.5 us, 3.2 sy, 84.3 id');
+                    addOutput('MiB Mem: 8192.0 total, 4521.3 used');
+                    return '\nPID USER  %CPU %MEM    TIME+ COMMAND\n 42 halo  25.0  2.1   0:02.34 halo-server\n 43 halo  10.2  1.8   0:01.12 halo-api';
+                }
+            },
+            
+            git: {
+                description: 'Git version control',
+                execute: (args) => {
+                    if (!args[0]) {
+                        return 'usage: git <command> [<args>]';
+                    }
+                    
+                    switch(args[0]) {
+                        case 'status':
+                            return 'On branch main\nYour branch is up to date with \'origin/main\'.\n\nnothing to commit, working tree clean';
+                        case 'log':
+                            return 'commit a47e4fb (HEAD -> main)\nAuthor: HALO Admin <admin@halo-system.com>\nDate:   Thu Jan 15 10:00:00 2024 -0500\n\n    Update terminal system';
+                        case '--version':
+                            return 'git version 2.34.1';
+                        default:
+                            return `git: '${args[0]}' is not a git command`;
+                    }
+                }
+            },
+            
+            node: {
+                description: 'Run JavaScript',
+                execute: (args) => {
+                    if (!args[0]) {
+                        return 'Welcome to Node.js v18.17.0.\nType ".help" for more information.';
+                    }
+                    
+                    if (args[0] === '-v' || args[0] === '--version') {
+                        return 'v18.17.0';
+                    }
+                    
+                    // Simple JavaScript evaluation (be careful with this in production!)
+                    if (args[0] === '-e') {
+                        try {
+                            const code = args.slice(1).join(' ');
+                            return String(eval(code));
+                        } catch (e) {
+                            return `Error: ${e.message}`;
+                        }
+                    }
+                    
+                    return `node: ${args[0]}: No such file or directory`;
+                }
+            },
+            
+            python: {
+                description: 'Run Python',
+                execute: (args) => {
+                    if (!args[0]) {
+                        return 'Python 3.9.7 (default, Sep 16 2021, 13:09:58)\nType "help", "copyright", "credits" or "license" for more information.';
+                    }
+                    
+                    if (args[0] === '--version') {
+                        return 'Python 3.9.7';
+                    }
+                    
+                    return `python: can't open file '${args[0]}': [Errno 2] No such file or directory`;
+                }
+            },
+            
+            exit: {
+                description: 'Exit terminal',
+                execute: () => {
+                    window.location.href = 'index.html';
+                    return 'Goodbye!';
+                }
+            }
+        };
+        
+        // Path resolution
+        function resolvePath(path, returnPath = false) {
+            if (path === '/') {
+                return returnPath ? '/' : fileSystem['/'];
+            }
+            
+            let current = fileSystem['/'];
+            let resolvedPath = '/';
+            
+            const parts = path.startsWith('/') 
+                ? path.slice(1).split('/').filter(p => p)
+                : [...currentDirectory.slice(1).split('/').filter(p => p), ...path.split('/').filter(p => p)];
+            
+            for (const part of parts) {
+                if (part === '.') continue;
+                if (part === '..') {
+                    const parentParts = resolvedPath.split('/').filter(p => p);
+                    parentParts.pop();
+                    resolvedPath = '/' + parentParts.join('/');
+                    
+                    // Navigate back to parent
+                    current = fileSystem['/'];
+                    for (const p of parentParts) {
+                        if (current.children && current.children[p]) {
+                            current = current.children[p];
+                        }
+                    }
+                    continue;
+                }
+                
+                if (current.children && current.children[part]) {
+                    current = current.children[part];
+                    resolvedPath = resolvedPath === '/' ? '/' + part : resolvedPath + '/' + part;
+                } else {
+                    return null;
+                }
+            }
+            
+            return returnPath ? resolvedPath : current;
+        }
+        
+        // Update prompt
+        function updatePrompt() {
+            document.getElementById('terminalTitle').textContent = `HALO Terminal Pro - ${currentDirectory}`;
+        }
+        
+        // Initialize Terminal
+        function initTerminal() {
+            const asciiArt = `
+<span class="ascii-art">
+ _   _   ___   _     ___    ____                
+| | | | / _ \\ | |   / _ \\  |  _ \\ _ __ ___  
+| |_| |/ /_\\ \\| |  | | | | | |_) | '__/ _ \\ 
+|  _  ||  _  || |  | | | | |  __/| | | (_) |
+| | | || | | || |__| |_| | |_|   |_|  \\___/ 
+\\_| |_/\\_| |_/\\____/\\___/  
+
+HALO Terminal Pro v4.0.0 - Advanced System Console
+</span>`;
+            
+            addRawOutput(asciiArt);
+            addOutput('Welcome to HALO Terminal Pro - Full system access enabled', 'success');
+            addOutput('Type "help" for available commands\n');
+            currentDirectory = '/home/user';
+            updatePrompt();
+            addInputLine();
+        }
+        
+        // Add output to terminal
+        function addOutput(text, type = 'output') {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = `terminal-line terminal-${type}`;
+            line.textContent = text;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        // Add raw HTML output
+        function addRawOutput(html) {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = html;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        // Add command line
+        function addCommandLine(command) {
+            const terminalBody = document.getElementById('terminalBody');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            const displayPath = currentDirectory.replace('/home/user', '~');
+            line.innerHTML = `<span class="terminal-prompt">${displayPath}$</span> <span class="terminal-command">${escapeHtml(command)}</span>`;
+            terminalBody.appendChild(line);
+            scrollToBottom();
+        }
+        
+        // Add input line
+        function addInputLine() {
+            if (isProcessing) return;
+            
+            const terminalBody = document.getElementById('terminalBody');
+            const inputLine = document.createElement('div');
+            inputLine.className = 'terminal-input-line';
+            const displayPath = currentDirectory.replace('/home/user', '~');
+            inputLine.innerHTML = `
+                <span class="terminal-input-prompt">${displayPath}$</span>
+                <input type="text" class="terminal-input" id="terminalInput" autocomplete="off" spellcheck="false">
+                <span class="cursor" id="cursor"></span>
+            `;
+            terminalBody.appendChild(inputLine);
+            
+            const input = document.getElementById('terminalInput');
+            input.focus();
+            
+            // Event listeners
+            input.addEventListener('keydown', handleKeyDown);
+            input.addEventListener('input', handleInput);
+            
+            scrollToBottom();
+        }
+        
+        // Handle keyboard input
+        function handleKeyDown(e) {
+            const input = e.target;
+            
+            switch(e.key) {
+                case 'Enter':
+                    e.preventDefault();
+                    processCommand(input.value);
+                    break;
+                    
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (historyIndex < commandHistory.length - 1) {
+                        historyIndex++;
+                        input.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                    }
+                    break;
+                    
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (historyIndex > 0) {
+                        historyIndex--;
+                        input.value = commandHistory[commandHistory.length - 1 - historyIndex];
+                    } else if (historyIndex === 0) {
+                        historyIndex = -1;
+                        input.value = '';
+                    }
+                    break;
+                    
+                case 'Tab':
+                    e.preventDefault();
+                    autocomplete(input);
+                    break;
+                    
+                case 'l':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        commands.clear.execute();
+                        addInputLine();
+                    }
+                    break;
+            }
+        }
+        
+        // Handle input changes
+        function handleInput(e) {
+            // Could add real-time suggestions here
+        }
+        
+        // Process command
+        async function processCommand(commandText) {
+            if (isProcessing) return;
+            isProcessing = true;
+            
+            const input = document.getElementById('terminalInput');
+            const inputLine = input.parentElement;
+            inputLine.removeChild(input);
+            inputLine.removeChild(document.getElementById('cursor'));
+            
+            addCommandLine(commandText);
+            
+            if (commandText.trim()) {
+                commandHistory.push(commandText);
+                historyIndex = -1;
+                
+                const [cmd, ...args] = commandText.trim().split(' ');
+                
+                if (commands[cmd]) {
+                    try {
+                        const result = await commands[cmd].execute(args);
+                        if (result !== null) {
+                            if (result) {
+                                if (cmd === 'ls' || cmd === 'cat') {
+                                    addRawOutput(result);
+                                } else {
+                                    addOutput(result);
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        addOutput(`Error: ${error.message}`, 'error');
+                    }
+                } else if (commandText.trim()) {
+                    addOutput(`bash: ${cmd}: command not found`, 'error');
+                }
+            }
+            
+            isProcessing = false;
+            addInputLine();
+        }
+        
+        // Autocomplete function
+        function autocomplete(input) {
+            const value = input.value.split(' ').pop();
+            const allCommands = Object.keys(commands);
+            
+            // Add files/directories from current directory
+            const dir = resolvePath(currentDirectory);
+            if (dir && dir.children) {
+                allCommands.push(...Object.keys(dir.children));
+            }
+            
+            const matches = allCommands.filter(cmd => cmd.startsWith(value));
+            
+            if (matches.length === 1) {
+                const parts = input.value.split(' ');
+                parts[parts.length - 1] = matches[0];
+                input.value = parts.join(' ');
+            } else if (matches.length > 1) {
+                addOutput(`\nPossible completions: ${matches.join('  ')}`);
+                addInputLine();
+                document.getElementById('terminalInput').value = input.value;
+            }
+        }
+        
+        // Utility functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function scrollToBottom() {
+            const terminalBody = document.getElementById('terminalBody');
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initTerminal);
+    </script>
+</body>
+</html>
