@@ -307,7 +307,7 @@ Available Commands:
   clear         - Clear the terminal
   status        - Show system status
   stats         - Display business statistics
-  members       - List active members
+  clients       - List active clients
   locations     - Show all locations
   services      - List available services
   inventory     - Check inventory levels
@@ -354,32 +354,32 @@ HALO System Status:
                     return `
 Business Statistics (Last 30 days):
   Total Revenue:       $347,892
-  Active Members:      892
-  New Patients:        156
+  Active Clients:      892
+  New Clients:         156
   Services Rendered:   3,421
   Avg Wait Time:       8.2 min
   Satisfaction Rate:   96.3%
   
 Top Services:
-  1. IV Therapy        (642)
-  2. Chiropractic      (534)
-  3. Massage Therapy   (412)`;
+  1. Consultation      (642)
+  2. Analysis          (534)
+  3. Implementation    (412)`;
                 }
             },
             
-            members: {
-                description: 'List active members',
+            clients: {
+                description: 'List active clients',
                 execute: async () => {
-                    addOutput('Fetching member data...', 'info');
+                    addOutput('Fetching client data...', 'info');
                     await sleep(800);
                     return `
-Active Members by Tier:
-  Total Wellness (Tier 4):  124 members
-  Renew (Tier 3):          287 members
-  Revive (Tier 2):         341 members
-  Restore (Tier 1):        140 members
+Active Clients by Tier:
+  Enterprise (Tier 4):    124 clients
+  Professional (Tier 3):  287 clients
+  Business (Tier 2):      341 clients
+  Starter (Tier 1):       140 clients
   
-Total Active: 892 members
+Total Active: 892 clients
 Monthly Recurring Revenue: $241,876`;
                 }
             },
@@ -389,20 +389,20 @@ Monthly Recurring Revenue: $241,876`;
                 execute: () => {
                     return `
 Active Locations:
-  1. Paducah, KY
+  1. New York, NY
      Status: Online
-     Staff: 18 active
-     Queue: 3 waiting
+     Team: 18 active
+     Tasks: 3 pending
   
-  2. Nashville, TN
+  2. Los Angeles, CA
      Status: Online
-     Staff: 22 active
-     Queue: 5 waiting
+     Team: 22 active
+     Tasks: 5 pending
   
-  3. Louisville, KY
+  3. Chicago, IL
      Status: Online
-     Staff: 15 active
-     Queue: 2 waiting`;
+     Team: 15 active
+     Tasks: 2 pending`;
                 }
             },
             
@@ -411,17 +411,17 @@ Active Locations:
                 execute: () => {
                     return `
 Available Services:
-  - Chiropractic
-  - Massage Therapy (60/90 min)
-  - Cupping Therapy
-  - Dry Needling
-  - Colon Hydrotherapy
-  - IV Nutrition Therapy
-  - NAD+ IV Infusion
-  - Vitamin Injections
-  - Peptide Therapy
-  - Blood Testing
-  - Wellness Consultations`;
+  - Business Process Analysis
+  - Digital Transformation
+  - Cloud Infrastructure
+  - Data Analytics
+  - Security Auditing
+  - Compliance Management
+  - Workflow Automation
+  - API Integration
+  - Custom Development
+  - Training & Support
+  - Strategic Consulting`;
                 }
             },
             
@@ -431,18 +431,18 @@ Available Services:
                     addOutput('Scanning inventory...', 'info');
                     await sleep(1200);
                     return `
-Critical Inventory Alerts:
-  ! IV Saline Bags      12 units  (ORDER NOW)
-  ! B12 Vials           8 units   (LOW STOCK)
+Critical Resource Alerts:
+  ! Server Capacity     12% free   (EXPAND NOW)
+  ! API Credits         8k left    (LOW QUOTA)
   
-Current Stock Levels:
-  NAD+ Vials:          45 units
-  Glutathione:         62 units
-  Vitamin C:           89 units
-  Myers Cocktail:      34 units
-  Massage Oil:         156 units
+Current Resource Levels:
+  CPU Usage:           45%
+  Memory:              62%
+  Storage:             89%
+  Bandwidth:           34%
+  Active Sessions:     156
   
-Auto-reorder enabled for 23 items.`;
+Auto-scaling enabled for 23 services.`;
                 }
             },
             
@@ -453,16 +453,16 @@ Auto-reorder enabled for 23 items.`;
                     await sleep(1000);
                     return `
 Revenue Metrics (Current Month):
-  Membership Revenue:    $241,876
+  Subscription Revenue:  $241,876
   Service Revenue:       $89,432
-  Retail Revenue:        $16,584
+  License Revenue:       $16,584
   Total Revenue:         $347,892
   
   YoY Growth:           +23.4%
   MoM Growth:           +5.2%
   
-  Top Revenue Service:   IV Therapy ($42,891)
-  Top Location:          Nashville ($156,234)`;
+  Top Revenue Service:   Analytics ($42,891)
+  Top Location:          New York ($156,234)`;
                 }
             },
             
@@ -502,11 +502,11 @@ API Endpoints:
     POST   /auth/logout
     GET    /auth/verify
   
-  Patients:
-    GET    /patients
-    POST   /patients
-    GET    /patients/:id
-    PUT    /patients/:id
+  Clients:
+    GET    /clients
+    POST   /clients
+    GET    /clients/:id
+    PUT    /clients/:id
   
   Documentation: https://docs.halo-system.com/api`;
                 }
@@ -527,16 +527,16 @@ API Endpoints:
 HALO Business Management System
 Version 4.0.0
 
-Enterprise-grade platform for wellness centers,
-medical spas, and healthcare facilities.
+Enterprise-grade platform for modern businesses
+requiring comprehensive operational management.
 
 Features:
-- Complete patient management
+- Complete client management
 - Multi-location support
 - Real-time analytics
-- Inventory tracking
+- Resource tracking
 - Financial reporting
-- Staff management
+- Team management
 - And much more...
 
 © 2024 HALO Corporation. All rights reserved.`;
